@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useReducer } from 'react';
+import { createContext, useContext, useEffect, useReducer, useCallback, useMemo } from 'react';
 import { maquillajesReducer, initialState, ACTIONS } from '../reducers/maquillajesReducer';
 
 const MaquillajesContext = createContext();
@@ -6,11 +6,14 @@ const MaquillajesContext = createContext();
 export const MaquillajesProvider = ({ children }) => {
   const [state, dispatch] = useReducer(maquillajesReducer, initialState);
 
-  const setError = (message) => {
+  // envuelvo set error en usecallback porque la voy a usar adentro de otras funciones
+  // que tambien van a estar memorizadas. como dispatch nunca cambia, el array queda vacio.
+  const setError = useCallback((message) => {
     dispatch({ type: ACTIONS.SET_ERROR, payload: message });
-  };
+  }, []);
 
-  const obtenerMaquillajes = async () => {
+  // le meto usecallback a obtener maquillajes por si algun componente lo necesita usar en un useeffect
+  const obtenerMaquillajes = useCallback(async () => {
     dispatch({ type: ACTIONS.SET_CARGANDO, payload: true });
     setError(null);
 
@@ -24,9 +27,11 @@ export const MaquillajesProvider = ({ children }) => {
     } finally {
       dispatch({ type: ACTIONS.SET_CARGANDO, payload: false });
     }
-  };
+  }, [setError]); // depende de setError, por eso la puse arriba
 
-  const agregarMaquillaje = async (nuevoProducto) => {
+  // aca empieza el combo del pdf. le pongo usecallback a las funciones que le voy a pasar a los hijos
+  // asi mantienen su referencia y no rompen el react.memo de itemmaquillaje
+  const agregarMaquillaje = useCallback(async (nuevoProducto) => {
     try {
       const respuesta = await fetch('http://localhost:3000/api/maquillajes', {
         method: 'POST',
@@ -41,9 +46,10 @@ export const MaquillajesProvider = ({ children }) => {
     } catch (error) {
       setError(error.message);
     }
-  };
+  }, [setError]);
 
-  const editarMaquillaje = async (id, productoActualizado) => {
+  // la funcion de editar, clave para el itemmaquillaje que tiene memo
+  const editarMaquillaje = useCallback(async (id, productoActualizado) => {
     try {
       const respuesta = await fetch(`http://localhost:3000/api/maquillajes/${id}`, {
         method: 'PUT',
@@ -58,9 +64,10 @@ export const MaquillajesProvider = ({ children }) => {
     } catch (error) {
       setError(error.message);
     }
-  };
+  }, [setError]);
 
-  const borrarMaquillaje = async (id) => {
+  // la funcion de borrar, otra mas pal combo
+  const borrarMaquillaje = useCallback(async (id) => {
     try {
       const respuesta = await fetch(`http://localhost:3000/api/maquillajes/${id}`, {
         method: 'DELETE',
@@ -72,22 +79,25 @@ export const MaquillajesProvider = ({ children }) => {
     } catch (error) {
       setError(error.message);
     }
-  };
+  }, [setError]);
 
   useEffect(() => {
     obtenerMaquillajes();
-  }, []);
+  }, [obtenerMaquillajes]);
+
+  // buena practica plus: memorizo el objeto entero del value del contexto con usememo.
+  // si no hago esto, react crea un objeto nuevo en cada render y todos los que usen
+  // usemaquillajescontext se van a renderizar igual al pedo.
+  const contextValue = useMemo(() => ({
+    ...state,
+    agregarMaquillaje,
+    editarMaquillaje,
+    borrarMaquillaje,
+    obtenerMaquillajes,
+  }), [state, agregarMaquillaje, editarMaquillaje, borrarMaquillaje, obtenerMaquillajes]);
 
   return (
-    <MaquillajesContext.Provider
-      value={{
-        ...state,
-        agregarMaquillaje,
-        editarMaquillaje,
-        borrarMaquillaje,
-        obtenerMaquillajes,
-      }}
-    >
+    <MaquillajesContext.Provider value={contextValue}>
       {children}
     </MaquillajesContext.Provider>
   );

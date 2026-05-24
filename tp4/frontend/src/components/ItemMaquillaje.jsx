@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
-export const ItemMaquillaje = ({ producto, borrarMaquillaje, editarMaquillaje }) => {
+export const ItemMaquillaje = memo(({ producto, borrarMaquillaje, editarMaquillaje }) => {
   const [editando, setEditando] = useState(false);
 
   // estados locales para manejar los cambios en el formulario de edicion. Se inicializan con los valores actuales del producto
@@ -8,6 +8,8 @@ export const ItemMaquillaje = ({ producto, borrarMaquillaje, editarMaquillaje })
   const [nuevaMarca, setNuevaMarca] = useState(producto.marca);
   const [nuevaCategoria, setNuevaCategoria] = useState(producto.categoria);
   const [nuevoPrecio, setNuevoPrecio] = useState(producto.precio);
+
+  console.log(`Se está renderizando el producto: ${producto.nombre}`);
 
   // armamos el objeto completo con todos los datos nuevos
   const manejarGuardar = () => {
@@ -115,4 +117,5 @@ export const ItemMaquillaje = ({ producto, borrarMaquillaje, editarMaquillaje })
       )}
     </li>
   );
-};
+});
+

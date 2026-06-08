@@ -1,4 +1,5 @@
 import { useState, memo } from 'react';
+import { useState, memo } from 'react';
 
 //envolvemos el componente con memo para evitar re-renderizados innecesarios cuando las props no cambian
 export const ItemMaquillaje = memo(({ producto, borrarMaquillaje, editarMaquillaje }) => {
@@ -9,6 +10,8 @@ export const ItemMaquillaje = memo(({ producto, borrarMaquillaje, editarMaquilla
   const [nuevaMarca, setNuevaMarca] = useState(producto.marca);
   const [nuevaCategoria, setNuevaCategoria] = useState(producto.categoria);
   const [nuevoPrecio, setNuevoPrecio] = useState(producto.precio);
+
+  console.log(`Se está renderizando el producto: ${producto.nombre}`);
 
   // armamos el objeto completo con todos los datos nuevos
   const manejarGuardar = () => {

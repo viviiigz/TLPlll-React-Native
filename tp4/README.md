@@ -1,83 +1,38 @@
 
-# Project Title
+# Guía Rápida de Optimización en React 🚀
 
-A brief description of what this project does and who it's for
+Esta guía resume cuándo y cómo utilizar las herramientas de memoización para mejorar el rendimiento de tus componentes.
 
-#  Catálogo de Maquillaje - Trabajo Práctico Nro 2
+> **Regla de oro:** No optimices a ciegas; la optimización prematura suele traer más complejidad que beneficios.
 
-##  Introducción
-Este proyecto es una aplicación web full-stack desarrollada para la gestión de un catálogo de productos de maquillaje. La plataforma permite a los usuarios visualizar una lista de productos disponibles, agregar nuevos artículos, actualizar sus precios y eliminar productos del catálogo, operando bajo una arquitectura cliente-servidor.
+---
 
-## Objetivo de la Actividad
-El objetivo principal de este trabajo práctico es demostrar la comprensión técnica del flujo de datos entre un frontend desarrollado en React y un backend en Node.js. 
+## 1. React.memo (Para componentes)
 
-Para lograr esto, se implementaron los siguientes requerimientos técnicos:
-- Creación de una API RESTful propia (métodos GET, POST, PUT, DELETE).
-- Consumo de la API desde el cliente utilizando `fetch` y promesas (`async/await`).
-- Implementación de Hooks de React (`useState` y `useEffect`) para el manejo del ciclo de vida y el estado de la aplicación.
-- Modularización del código a través de componentes funcionales y la creación de un Custom Hook (`useMaquillajes`) para abstraer la lógica de negocio.
-- Manejo de estados de carga (loading) y visualización de errores.
-- Diseño de interfaz responsiva y estilizada utilizando Tailwind CSS.
+*   **¿Qué hace?** Evita que un componente se vuelva a renderizar si sus props no cambiaron.
+*   **¿Cuándo usarlo?** En componentes que se renderizan muchas veces (ej. ítems de una lista larga) y que reciben las mismas props frecuentemente.
+*   **Regla de funcionamiento:** El componente debe estar envuelto en `memo(...)`. Si el padre se renderiza, React hará una "comparación superficial" de las props. Si son iguales, el componente hijo no se renderiza.
 
-##  Tecnologías Utilizadas
-**Frontend:**
-- React.js (Vite)
-- Tailwind CSS (v3)
-- Custom Hooks
-- Bootstrap Icons & Google Fonts (Poppins)
+## 2. useCallback (Para funciones)
 
-**Backend:**
-- Node.js
-- Express.js
-- CORS
-- Estructura de datos en memoria para almacenamiento temporal.
+*   **¿Qué hace?** Memoriza la referencia de una función para que no cambie en cada renderizado.
+*   **¿Cuándo usarlo?** Cuando pasas una función como prop a un componente hijo que ya está optimizado con `React.memo`.
+*   **El "Combo":** Si no usas `useCallback` en el padre, la función se vuelve a crear en cada render, el hijo cree que la prop cambió y `React.memo` no sirve de nada.
 
-##  Estructura del Proyecto
-El proyecto está dividido en dos directorios principales, manteniendo una separación limpia de responsabilidades:
+## 3. useMemo (Para valores calculados)
 
-```text
-/ (Raíz del proyecto)
-├── /backend/               # Servidor Express.js y lógica de la API
-│   ├── index.js            # Endpoints (CRUD) y configuración del servidor
-│   └── package.json
-│
-└── /frontend/              # Aplicación cliente React
-    ├── /src/
-    │   ├── /components/    # Componentes modulares (Formulario, Lista, Item)
-    │   ├── /hooks/         # Lógica separada (useMaquillajes.js)
-    │   ├── App.jsx         # Componente orquestador principal
-    │   └── App.css         # Configuración base de Tailwind y variables
-    ├── tailwind.config.js
-    └── package.json
+*   **¿Qué hace?** Memoriza el resultado de un cálculo costoso (filtrar, ordenar, operaciones matemáticas complejas).
+*   **¿Cuándo usarlo?** Cuando el cálculo es tan pesado que quieres evitar hacerlo en cada render si sus dependencias no han cambiado.
+*   **¿Cuándo NO usarlo?** Para cálculos simples. El hook en sí tiene un costo de memoria, así que para operaciones rápidas es mejor dejar que React las haga normalmente.
 
+---
 
- Cómo ejecutar el proyecto localmente
-Para que la aplicación funcione correctamente, es necesario levantar ambos entornos en dos terminales separadas.
+## Tabla Resumen: El Combo de la Optimización
 
-1. Iniciar el Servidor (Backend)
-Abrir una terminal, navegar a la carpeta backend y ejecutar:
-
-Bash
-cd backend
-npm install
-npm run dev
-(El servidor quedará escuchando en http://localhost:3000)
-
-2. Iniciar el Cliente (Frontend)
-Abrir una segunda terminal, navegar a la carpeta frontend y ejecutar:
-
-Bash
-cd frontend
-npm install
-npm run dev
-
- Funcionalidades Principales (CRUD)
-Create: Formulario integrado para agregar nuevas bases, labiales o máscaras indicando nombre, marca, categoría y precio.
-
-Read: Renderizado dinámico de la lista de productos almacenados en el servidor, incluyendo un estado visual de "Cargando..." mientras se espera la respuesta de la API. Incorpora un buscador en tiempo real.
-
-Update: Interfaz in-line que permite habilitar un modo edición en cada tarjeta de producto para actualizar los detalles o el precio y guardarlos en el servidor.
-
-Delete: Botón de acción rápida para eliminar permanentemente un producto del catálogo.
+| Herramienta | ¿Qué memoriza? | Caso típico |
+| :--- | :--- | :--- |
+| **React.memo** | Un componente entero | Hijos pesados con props estables |
+| **useMemo** | Un valor calculado | Cálculos costosos u objetos como prop |
+| **useCallback** | Una función | Funciones pasadas a hijos memorizados |
 
 Viviana Gonzalez

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
-export const ItemMaquillaje = ({ producto, borrarMaquillaje, editarMaquillaje }) => {
+//envolvemos el componente con memo para evitar re-renderizados innecesarios cuando las props no cambian
+export const ItemMaquillaje = memo(({ producto, borrarMaquillaje, editarMaquillaje }) => {
   const [editando, setEditando] = useState(false);
 
   // estados locales para manejar los cambios en el formulario de edicion. Se inicializan con los valores actuales del producto
@@ -19,6 +20,9 @@ export const ItemMaquillaje = ({ producto, borrarMaquillaje, editarMaquillaje })
     });
     setEditando(false);
   };
+
+  // 👇 ¡Este es el único cambio que agregué! 
+  console.log(`Renderizando ItemMaquillaje: ${producto.nombre}`);
 
   return (
     <li className="bg-white rounded-2xl p-6 shadow-sm border border-pink-100 hover:shadow-md transition-all duration-300">
@@ -115,4 +119,4 @@ export const ItemMaquillaje = ({ producto, borrarMaquillaje, editarMaquillaje })
       )}
     </li>
   );
-};
+});

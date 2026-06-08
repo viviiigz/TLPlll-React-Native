@@ -1,5 +1,4 @@
 import { useState, memo } from 'react';
-import { useState, memo } from 'react';
 
 //envolvemos el componente con memo para evitar re-renderizados innecesarios cuando las props no cambian
 export const ItemMaquillaje = memo(({ producto, borrarMaquillaje, editarMaquillaje }) => {

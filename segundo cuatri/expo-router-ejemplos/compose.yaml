@@ -1,0 +1,20 @@
+# Levantar la app:   podman compose run --rm expo
+# Con túnel:         podman compose run --rm expo npx expo start --tunnel
+services:
+  expo:
+    build:
+      context: .
+      dockerfile: Containerfile
+    image: localhost/app-rutas-expo
+    # Red del host: el QR muestra la IP real de la PC y Expo Go puede conectarse
+    network_mode: host
+    volumes:
+      # El código se monta en vivo: al guardar un archivo, la app se recarga
+      - .:/app:Z
+      # node_modules queda dentro de un volumen, no en tu carpeta
+      - node_modules:/app/node_modules
+    tty: true
+    stdin_open: true
+
+volumes:
+  node_modules:

@@ -1,0 +1,19 @@
+# Imagen de desarrollo: corre Expo sin instalar Node ni npm en la PC.
+# Node 24 LTS es compatible con React Native 0.86 (Expo SDK 57).
+FROM docker.io/library/node:24-bookworm-slim
+
+WORKDIR /app
+
+# Para `npx expo start --tunnel` (cuando el celular no ve la PC en la red)
+RUN npm install --global @expo/ngrok@^4.1.0
+
+# Primero solo package.json: la capa de dependencias se reutiliza entre builds
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+# Metro, el servidor de desarrollo de Expo
+EXPOSE 8081
+
+CMD ["npx", "expo", "start"]

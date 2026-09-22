@@ -32,31 +32,78 @@ c) Dá un ejemplo de la vida real y otro de una aplicación móvil para cada una
 
   
 **A2. Seguimiento de una pila**
-(1) `console.log(p.tope());` -> 
-(2) `console.log(p.pop());` -> 
-(3) `console.log(p.tope());` -> 
-(4) `console.log(p.vacia);` -> 
-*Estado final de la pila (de base a tope):* 
+(1) `console.log(p.tope());` ->   Imprime 'Perfil'. El método tope() solo "mira" el elemento de arriba de todo sin sacarlo.
+
+(2) `console.log(p.pop());` ->   Imprime 'Perfil'. El método pop() saca el elemento de arriba de todo y te lo devuelve. La pila queda reducida a ['Inicio', 'Productos'].
+
+(3) `console.log(p.tope());` ->  Imprime 'Productos'. Como 'Perfil' ya salió en el paso anterior, el nuevo tope ahora es 'Productos'.
+
+(4) `console.log(p.vacia);` ->  Imprime false. La pila aún tiene dos elementos, por lo que no está vacía.
+
+*Estado final de la pila (de base a tope):*  ['Inicio', 'Productos']. 
+
 
 **A3. Seguimiento de una cola**
-(1) `console.log(c.frente());` -> 
-(2) `console.log(c.desencolar());` -> 
-(3) `console.log(c.vacia);` -> 
-*Estado final de la cola (de frente a final):* 
+
+(1) `console.log(c.frente());` -> Imprime 'Beto'. El método frente() solo "mira" quién es el primero en la fila sin sacarlo
+
+
+(2) `console.log(c.desencolar());` -> Imprime 'Beto'. El método desencolar() atiende a Beto y lo saca de la fila. La cola queda reducida a ['Caro', 'Dani'].
+
+(3) `console.log(c.vacia);` -> Imprime false. La cola aún tiene a Caro y Dani esperando.
+
+*Estado final de la cola (de frente a final):*   ['Caro', 'Dani']
 
 **A4. Análisis de la implementación**
 a) ¿Qué significa el # y qué problema evita?
+
 *Respuesta:*
+
+El símbolo # convierte a la propiedad (como #items) en un campo privado de la clase. Esto evita que código externo pueda acceder o modificar el array directamente (por ejemplo, impidiendo que alguien haga pila.#items.length = 0). Garantiza el encapsulamiento para que la estructura solo pueda modificarse usando los métodos permitidos (push, pop, etc.).
 
 b) ¿Qué problema de rendimiento tiene shift() con colas muy grandes? ¿Cómo lo resuelven las colas "serias"?
+
 *Respuesta:*
 
+El método shift() elimina el primer elemento del array, lo que obliga a JavaScript a reasignar los índices de todos los elementos restantes uno por uno hacia atrás. En colas grandes, esto consume mucha memoria y tiempo de procesamiento. Las colas eficientes lo resuelven utilizando un puntero (un índice guardado en una variable) que avanza para indicar cuál es el nuevo "frente", sin necesidad de reacomodar todo el array en cada extracción.
+
 c) ¿Qué método de array usa la pila para sacar y cuál usa la cola? ¿Por qué no pueden usar el mismo?
+
 *Respuesta:*
+
+La pila usa pop() y la cola usa shift(). No pueden usar el mismo método porque obedecen lógicas contrarias: la pila debe sacar el último elemento que ingresó al final del array (comportamiento LIFO), mientras que la cola está obligada a sacar el elemento más antiguo que se encuentra al principio del array (comportamiento FIFO).
 
 **A5. Programación: una cola eficiente**
 \`\`\`javascript
-// Tu clase ColaEficiente aquí
+class ColaEficiente {
+  #items = [];
+  #frenteIndex = 0;
+
+  encolar(elemento) {
+    this.#items.push(elemento);
+  }
+
+  desencolar() {
+    if (this.vacia) return undefined;
+    const elemento = this.#items[this.#frenteIndex];
+    this.#items[this.#frenteIndex] = undefined; 
+    this.#frenteIndex++;
+    return elemento;
+  }
+
+  frente() {
+    if (this.vacia) return undefined;
+    return this.#items[this.#frenteIndex];
+  }
+
+  get vacia() {
+    return this.#frenteIndex >= this.#items.length;
+  }
+
+  get tamanio() {
+    return this.#items.length - this.#frenteIndex;
+  }
+}
 \`\`\`
 
 **A6. Pila y cola dentro de Expo Router**

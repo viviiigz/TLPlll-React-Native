@@ -1,35 +1,44 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useAppContext } from '../../context/AppContext';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function TabsLayout() {
+  const { pilaCarrito } = useAppContext();
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: '#4ade80' }}>
+      
+      {/* Tab 1: Inicio */}
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Inicio',
+          tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} />,
         }}
       />
+      
+      {/* Tab 2: Menú */}
       <Tabs.Screen
-        name="explore"
+        name="menu"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Menú',
+          headerShown: false, // Lo ocultamos para que el Stack interno maneje su propio header
+          tabBarIcon: ({ color }) => <Ionicons name="restaurant" size={24} color={color} />,
         }}
       />
+      
+      {/* Tab 3: Carrito */}
+      <Tabs.Screen
+        name="carrito"
+        options={{
+          title: 'Carrito',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <Ionicons name="cart" size={24} color={color} />,
+          // Requisito G1: Badge con la cantidad de items
+          tabBarBadge: pilaCarrito.vacia ? undefined : pilaCarrito.tamanio, 
+        }}
+      />
+      
     </Tabs>
   );
 }

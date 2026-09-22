@@ -1,4 +1,4 @@
-class Pila<T> {
+export class Pila<T> {
   #items: T[] = [];
 
   //todo Agrega un elemento al tope (final) de la pila

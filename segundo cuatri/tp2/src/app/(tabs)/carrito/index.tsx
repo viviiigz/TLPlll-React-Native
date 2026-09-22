@@ -1,12 +1,11 @@
-import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Link } from 'expo-router';
 import { useAppContext } from '../../../context/AppContext';
 import DondeEstoy from '../../../components/DondeEstoy';
 
 export default function CarritoScreen() {
-// le agregamos lo de actualizarUi pq no se estaba renderizando
-  const { pilaCarrito, deshacerUltimoCarrito, actualizarUI } = useAppContext();  
-  // usamos el método que creaste en tu clase Pila para obtener los items sin mutarla
+  const { pilaCarrito, deshacerUltimoCarrito, actualizarUI } = useAppContext(); 
+  
   const items = pilaCarrito.aArray();
   const total = items.reduce((suma, item) => suma + item.precio, 0);
 
@@ -15,7 +14,6 @@ export default function CarritoScreen() {
       <View style={styles.header}>
         <Text style={styles.tituloTotal}>Total: ${total}</Text>
         
-        {/*botón Deshacer que hace pop() y se deshabilita si está vacío */}
         <Pressable 
           style={[styles.botonDeshacer, pilaCarrito.vacia && styles.botonDeshabilitado]} 
           onPress={deshacerUltimoCarrito}
@@ -25,20 +23,19 @@ export default function CarritoScreen() {
         </Pressable>
       </View>
 
-      <FlatList
-        data={items}
-        // usamos el index como key porque en una pila puede haber platos repetidos
-        keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.tarjetaItem}>
-            <Text style={styles.nombreItem}>{item.nombre}</Text>
-            <Text style={styles.precioItem}>${item.precio}</Text>
-          </View>
+      {/*//!usamos ScrollView en lugar de FlatList para evitar los problemas de caché */}
+      <ScrollView style={styles.lista}>
+        {items.length === 0 ? (
+          <Text style={styles.textoVacio}>Tu carrito está triste y vacío</Text>
+        ) : (
+          items.map((item, index) => (
+            <View key={`${item.id}-${index}-${actualizarUI}`} style={styles.tarjetaItem}>
+              <Text style={styles.nombreItem}>{item.nombre}</Text>
+              <Text style={styles.precioItem}>${item.precio}</Text>
+            </View>
+          ))
         )}
-        ListEmptyComponent={
-          <Text style={styles.textoVacio}>Tu carrito está triste y vacío :c</Text>
-        }
-      />
+      </ScrollView>
 
       {!pilaCarrito.vacia && (
         <View style={styles.footer}>
@@ -64,6 +61,7 @@ const styles = StyleSheet.create({
   botonDeshacer: { backgroundColor: '#ef4444', padding: 10, borderRadius: 8 },
   botonDeshabilitado: { backgroundColor: '#fca5a5' },
   textoBoton: { color: '#fff', fontWeight: 'bold', textAlign: 'center' },
+  lista: { flex: 1 },
   tarjetaItem: { 
     flexDirection: 'row', justifyContent: 'space-between', 
     backgroundColor: '#fff', padding: 15, marginBottom: 10, borderRadius: 8 

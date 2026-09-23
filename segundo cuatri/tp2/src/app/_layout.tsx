@@ -8,7 +8,7 @@ function NavegacionRaiz() {
 
   return (
     <Stack>
-      {/* grupo de pesatñas */}
+      {/* grupo de pestañas */}
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       
       {/* modales y pantallas del Stack raíz */}
@@ -16,14 +16,19 @@ function NavegacionRaiz() {
       <Stack.Screen name="buscar" options={{ title: 'Buscador' }} />
       <Stack.Screen name="categorias/[categoria]" options={{ title: 'Categoría' }} />
       
-      {/* Ll pantalla de turno oculta el botón "Atrás" por requerimiento*/}
+      {/* {a pantalla de turno oculta el botón "Atrás" por requerimiento */}
       <Stack.Screen name="turno/[numero]" options={{ title: 'Tu Turno', headerBackVisible: false, gestureEnabled: false }} />
       
+      {/* rutas de Ayuda (indice y catch-all) */}
+      <Stack.Screen name="ayuda/index" options={{ title: 'Centro de Ayuda' }} />
+      <Stack.Screen name="ayuda/[...slug]" options={{ title: 'Artículo de Ayuda' }} />      
       {/* rutas protegidas */}
-      <Stack.Protected guard={conSesion}>
+      <Stack.Protected guard={conSesion}> 
         <Stack.Screen name="cocina" options={{ headerShown: false }} />
       </Stack.Protected>
       
+      <Stack.Screen name="pedido" options={{ headerShown: false }} />
+
       <Stack.Protected guard={!conSesion}>
         <Stack.Screen name="login" options={{ presentation: 'modal', title: 'Ingreso Cocina' }} />
       </Stack.Protected>

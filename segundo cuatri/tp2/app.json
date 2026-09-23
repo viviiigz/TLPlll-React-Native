@@ -1,11 +1,12 @@
 {
+  
   "expo": {
-    "name": "tp2",
-    "slug": "tp2",
+    "name": "TuApp",
+    "slug": "tu-app",
+    "scheme": "comedoripf",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "tp2",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

@@ -18,11 +18,11 @@ export default function CocinaLayout() {
         headerTintColor: '#fff',
         drawerActiveTintColor: '#10b981',
         // Agregamos el botón de salir directamente en el header derecho de todo el Drawer
-        headerRight: () => (
-          <Pressable onPress={handleCerrarSesion} style={{ marginRight: 15 }}>
-            <Text style={{ color: '#ef4444', fontWeight: 'bold' }}>Salir</Text>
-          </Pressable>
-        ),
+        // headerRight: () => (
+        //   <Pressable onPress={handleCerrarSesion} style={{ marginRight: 15 }}>
+        //     <Text style={{ color: '#ef4444', fontWeight: 'bold' }}>Salir</Text>
+        //   </Pressable>
+        // ),
       }}
     >
       <Drawer.Screen

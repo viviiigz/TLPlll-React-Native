@@ -28,7 +28,7 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Acceso a Cocina 👨‍🍳</Text>
+      <Text style={styles.titulo}>Acceso a Cocina </Text>
       <Text style={styles.subtitulo}>Ingresá tu clave de empleado</Text>
 
       <TextInput

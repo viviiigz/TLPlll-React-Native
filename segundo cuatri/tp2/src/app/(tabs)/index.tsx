@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Link } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import DondeEstoy from '../../components/DondeEstoy'; 
 
 export default function PantallaInicio() {
@@ -9,11 +10,33 @@ export default function PantallaInicio() {
       <Text style={styles.subtitulo}>¿Qué querés hacer hoy?</Text>
 
       <View style={styles.grilla}>
-        {/* usamos Link para la navegación directa como pide el requisito G2.5 */}
-        <Link href="/menu" style={styles.tarjeta}>🍽️ Menú</Link>
-        <Link href="/buscar" style={styles.tarjeta}>🔍 Buscar</Link>
-        <Link href="/ayuda" style={styles.tarjeta}>❓ Ayuda</Link>
-        <Link href="/login" style={[styles.tarjeta, styles.tarjetaCocina]}>👨‍🍳 Cocina</Link>
+        <Link href="/menu" asChild>
+          <Pressable style={styles.tarjeta}>
+            <MaterialIcons name="restaurant" size={24} color="#fff" />
+            <Text style={styles.textoTarjeta}>Menú</Text>
+          </Pressable>
+        </Link>
+        
+        <Link href="/buscar" asChild>
+          <Pressable style={styles.tarjeta}>
+            <MaterialIcons name="search" size={24} color="#fff" />
+            <Text style={styles.textoTarjeta}>Buscar</Text>
+          </Pressable>
+        </Link>
+        
+        <Link href="/ayuda" asChild>
+          <Pressable style={styles.tarjeta}>
+            <MaterialIcons name="help-outline" size={24} color="#fff" />
+            <Text style={styles.textoTarjeta}>Ayuda</Text>
+          </Pressable>
+        </Link>
+        
+<Link href="/login" asChild>
+  <Pressable style={StyleSheet.flatten([styles.tarjeta, styles.tarjetaCocina])}>
+    <MaterialIcons name="soup-kitchen" size={24} color="#fff" />
+    <Text style={styles.textoTarjeta}>Cocina</Text>
+  </Pressable>
+</Link>
       </View>
 
       {/* componente obligatorio para depuración */}
@@ -40,16 +63,20 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   tarjeta: {
-    paddingVertical: 20,
-    paddingHorizontal: 30,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
     backgroundColor: '#3b82f6',
-    color: '#fff',
     borderRadius: 12,
+    minWidth: 140,
+    flexDirection: 'row', 
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8, 
+  },
+  textoTarjeta: {
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
-    minWidth: 140,
-    overflow: 'hidden',
   },
   tarjetaCocina: {
     backgroundColor: '#ef4444', // Rojo para diferenciar el área de empleados

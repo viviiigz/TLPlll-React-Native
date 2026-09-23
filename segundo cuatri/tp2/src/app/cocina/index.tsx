@@ -37,7 +37,7 @@ export default function CocinaScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.titulo}>Panel de Cocina 👨‍🍳</Text>
+        <Text style={styles.titulo}>Panel de Cocina</Text>
         <Text style={styles.subtitulo}>Pedidos en espera: {colaPedidos.tamanio}</Text>
       </View>
 

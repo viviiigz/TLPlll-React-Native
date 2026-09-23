@@ -97,3 +97,8 @@ npx uri-scheme open comedoripf://menu/1 --android
 npx uri-scheme open comedoripf://menu/1 --ios
 
 ```
+
+## 6. Credenciales de Prueba (Rutas Protegidas)
+Para evaluar el sistema de acceso condicional y rutas protegidas del área de **Cocina**, por favor utilizá la siguiente credencial cuando la aplicación solicite el ingreso:
+
+* **Contraseña de acceso:** `1234`

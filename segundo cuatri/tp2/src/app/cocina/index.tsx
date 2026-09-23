@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
-import { useFocusEffect, router } from 'expo-router';
+import { useFocusEffect, router, Link } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import DondeEstoy from '../../components/DondeEstoy';
@@ -7,7 +7,7 @@ import Cargando from '../../components/Cargando';
 
 export default function CocinaScreen() {
   // 'forzarRender' para actualizar la vista, y dejamos 'actualizarUI'olo para las keys
-  const { colaPedidos, actualizarUI, forzarRender, logout } = useAppContext();
+  const { colaPedidos,atenderSiguiente, actualizarUI, forzarRender, logout } = useAppContext();
   const [estaCargando, setEstaCargando] = useState(true);
 
   useFocusEffect(
@@ -22,8 +22,8 @@ export default function CocinaScreen() {
   const pedidos = colaPedidos.aArray().filter(item => item !== undefined);
 
   const handleAtender = () => {
-    colaPedidos.desencolar();
     forzarRender(); // redibujar la pantalla
+    atenderSiguiente();
   };
 
   if (estaCargando) {
@@ -65,6 +65,7 @@ export default function CocinaScreen() {
       )}
 
       <Pressable 
+      
         style={styles.botonSalir} 
         onPress={() => {
           logout();

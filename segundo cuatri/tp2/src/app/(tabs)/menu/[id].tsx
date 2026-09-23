@@ -3,17 +3,33 @@ import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { platos } from '../../../data/platos';
 import { useAppContext } from '../../../context/AppContext';
 import DondeEstoy from '../../../components/DondeEstoy';
+import Cargando from '../../../components/Cargando';
+import { useState, useEffect } from 'react';
 
 export default function DetallePlato() {
-  // leemos el parámetro 'id' de la url (siempre llega como string)
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { agregarAlCarrito } = useAppContext();
+  const [estaCargando, setEstaCargando] = useState(true);
 
-  // validación del parámetro
   const plato = platos.find((p) => p.id.toString() === id);
 
-  // si alguien escribe un id que no existe 
+  useEffect(() => {
+    const timer = setTimeout(() => setEstaCargando(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // primero manejamos el estado de carga
+  if (estaCargando) {
+    return (
+      <View style={styles.center}>
+        <Stack.Screen options={{ title: 'Buscando...' }} />
+        <Cargando mensaje="Buscando detalles del plato..." />
+      </View>
+    );
+  }
+
+  // luego validamos si el plato no existe
   if (!plato) {
     return (
       <View style={styles.center}>
@@ -27,16 +43,14 @@ export default function DetallePlato() {
     );
   }
 
-  // acción al presionar el botón de agregar
   const handleAgregar = () => {
-    agregarAlCarrito(plato); // esto hace el push en la Pila 
+    agregarAlCarrito(plato); 
     Alert.alert('¡Agregado!', `${plato.nombre} se sumó al carrito.`);
-    router.back(); // usamos router.back() para volver a la lista programáticamente
+    router.back(); 
   };
 
   return (
     <View style={styles.container}>
-      {/* título del header = nombre del plato */}
       <Stack.Screen options={{ title: plato.nombre }} />
 
       <View style={styles.tarjeta}>

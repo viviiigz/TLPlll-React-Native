@@ -1,13 +1,34 @@
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useFocusEffect } from 'expo-router'; // Importamos useFocusEffect
+import { useCallback, useState } from 'react'; // Importamos useCallback
 import { useAppContext } from '../../../context/AppContext';
 import DondeEstoy from '../../../components/DondeEstoy';
+import Cargando from '../../../components/Cargando';
 
 export default function CarritoScreen() {
   const { pilaCarrito, deshacerUltimoCarrito, actualizarUI } = useAppContext(); 
+  const [estaCargando, setEstaCargando] = useState(true);
+
+  // useFocusEffect se ejecuta CADA VEZ que el usuario entra a la pestaña
+  useFocusEffect(
+    useCallback(() => {
+      setEstaCargando(true); // reinicia el estado de carga al entrar
+      const timer = setTimeout(() => setEstaCargando(false), 700);
+      
+      return () => clearTimeout(timer); 
+    }, [])
+  );
   
   const items = pilaCarrito.aArray();
   const total = items.reduce((suma, item) => suma + item.precio, 0);
+
+  if (estaCargando) {
+    return (
+      <View style={styles.center}>
+        <Cargando mensaje="Calculando totales..." />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -23,10 +44,9 @@ export default function CarritoScreen() {
         </Pressable>
       </View>
 
-      {/*//!usamos ScrollView en lugar de FlatList para evitar los problemas de caché */}
       <ScrollView style={styles.lista}>
         {items.length === 0 ? (
-          <Text style={styles.textoVacio}>Tu carrito está triste y vacío</Text>
+          <Text style={styles.textoVacio}>Tu carrito está triste y vacío :c</Text>
         ) : (
           items.map((item, index) => (
             <View key={`${item.id}-${index}-${actualizarUI}`} style={styles.tarjetaItem}>
@@ -56,6 +76,7 @@ export default function CarritoScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f3f4f6', padding: 15 },
+  center: { flex: 1, justifyContent: 'center', backgroundColor: '#f3f4f6' },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
   tituloTotal: { fontSize: 24, fontWeight: 'bold', color: '#1f2937' },
   botonDeshacer: { backgroundColor: '#ef4444', padding: 10, borderRadius: 8 },

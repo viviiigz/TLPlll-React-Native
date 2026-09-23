@@ -2,21 +2,24 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useAppContext } from '../context/AppContext';
 import DondeEstoy from '../components/DondeEstoy';
+import Cargando from '../components/Cargando'; 
+import { useState } from 'react'; 
 
 export default function ConfirmarScreen() {
-  // recibimos la nota si el usuario pasó por la pantalla anterior
   const { nota } = useLocalSearchParams<{ nota: string }>();
   const { pilaCarrito, confirmarPedido } = useAppContext();
+  // estado de carrga
+  const [estaCargando, setEstaCargando] = useState(false);
   
   const total = pilaCarrito.aArray().reduce((sum, item) => sum + item.precio, 0);
 
   const handleConfirmar = () => {
-    //confirmarPedido encola los datos y devuelve un número de turno
-    const numeroTurno = confirmarPedido(nota || 'Sin aclaraciones');
-    
-    // Uamos REPLACE para sobreescribir esta pantalla
-    // asi el usuario no puede volver atrás y duplicar el pedido
-    router.replace(`/turno/${numeroTurno}`);
+    setEstaCargando(true); 
+
+    setTimeout(() => {
+      const numeroTurno = confirmarPedido(nota || 'Sin aclaraciones');
+      router.replace(`/turno/${numeroTurno}`);
+    }, 1500);
   };
 
   return (
@@ -30,9 +33,14 @@ export default function ConfirmarScreen() {
         <Text style={styles.total}>Total a pagar: ${total}</Text>
       </View>
 
-      <Pressable style={styles.boton} onPress={handleConfirmar}>
-        <Text style={styles.textoBoton}>✅ Confirmar y Enviar a Cocina</Text>
-      </Pressable>
+      {/* condicional para mostrar el botón o el spinner */}
+      {estaCargando ? (
+        <Cargando mensaje="Enviando pedido a la cocina..." />
+      ) : (
+        <Pressable style={styles.boton} onPress={handleConfirmar}>
+          <Text style={styles.textoBoton}>✅ Confirmar y Enviar a Cocina</Text>
+        </Pressable>
+      )}
       
       <DondeEstoy />
     </View>

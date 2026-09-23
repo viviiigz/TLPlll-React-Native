@@ -8,6 +8,7 @@ export interface Pedido {
   numero: number;
   platos: Plato[];
   nota: string;
+  numeroTurno?: number;
 }
 
 interface AppContextType {
@@ -23,6 +24,7 @@ interface AppContextType {
   deshacerUltimoCarrito: () => void;
   confirmarPedido: (nota: string) => number;
   atenderSiguiente: () => void;
+  forzarRender: () => void;
   // trigger para re-renderizar pantallas
   actualizarUI: number;
 }
@@ -57,24 +59,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   //confirmar encola el pedido
-  const confirmarPedido = (nota: string) => {
+const confirmarPedido = (nota: string) => {
     if (pilaCarrito.vacia) return 0;
     
+    // guardamos el número en una constante para usarlo en ambas propiedades
+    const turnoGenerado = contadorPedidos.current++; 
+    
     const nuevoPedido: Pedido = {
-      numero: contadorPedidos.current++,
+      numero: turnoGenerado,
+      numeroTurno: turnoGenerado, 
       platos: pilaCarrito.aArray(),
       nota,
     };
     
     colaPedidos.encolar(nuevoPedido);
     
-    // vaciamos el carrito (pila) haciendole pop hasta que quede vacío
+    // vaciamos el carrito haciendole pop hasta que quede vacío
     while (!pilaCarrito.vacia) {
       pilaCarrito.pop();
     }
     
     forzarRender();
-    return nuevoPedido.numero;
+    return turnoGenerado; // retornamos la constante
   };
 
   // atender desencola y apila en el historial
@@ -91,7 +97,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       value={{
         usuario, login, logout,
         pilaCarrito, colaPedidos, pilaAtendidos,
-        agregarAlCarrito, deshacerUltimoCarrito, confirmarPedido, atenderSiguiente,
+        agregarAlCarrito, deshacerUltimoCarrito, confirmarPedido, atenderSiguiente, forzarRender,
         actualizarUI
       }}
     >

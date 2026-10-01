@@ -13,6 +13,7 @@ export default function AyudaIndexScreen() {
       <Text style={styles.subtitulo}>Seleccioná un tema para más información:</Text>
 
       <View style={styles.listaLinks}>
+        {/* desde el índice se entra a la categoría de pagos */}
         <Link href="/ayuda/pagos" asChild>
           <Pressable style={styles.botonTema}>
             <MaterialIcons name="credit-card" size={24} color="#3b82f6" />
@@ -20,13 +21,6 @@ export default function AyudaIndexScreen() {
           </Pressable>
         </Link>
         
-        <Link href="/ayuda/pagos/efectivo" asChild>
-          <Pressable style={styles.botonTema}>
-            <MaterialIcons name="payments" size={24} color="#3b82f6" />
-            <Text style={styles.textoTema}>Pagar con Efectivo en Caja</Text>
-          </Pressable>
-        </Link>
-
         <Link href="/ayuda/pedidos/demoras/reclamos" asChild>
           <Pressable style={styles.botonTema}>
             <MaterialIcons name="timer" size={24} color="#3b82f6" />

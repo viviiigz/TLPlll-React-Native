@@ -5,8 +5,7 @@ import DondeEstoy from '../../components/DondeEstoy';
 export default function AtendidosScreen() {
   const { pilaAtendidos, actualizarUI } = useAppContext();
 
-  // .reverse() garantiza que el último pedido atendido (el más reciente) aparezca arriba de todo
-  const despachados = pilaAtendidos.aArray().filter(item => item !== undefined).reverse();
+  const despachados = pilaAtendidos.aArray().filter(item => item !== undefined);
 
   return (
     <View style={styles.container}>

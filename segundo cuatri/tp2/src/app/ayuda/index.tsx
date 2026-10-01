@@ -21,10 +21,11 @@ export default function AyudaIndexScreen() {
           </Pressable>
         </Link>
         
-        <Link href="/ayuda/pedidos/demoras/reclamos" asChild>
+        {/* desde el índice se entra a la categoría de reclamos */}
+        <Link href="/ayuda/reclamos" asChild>
           <Pressable style={styles.botonTema}>
-            <MaterialIcons name="timer" size={24} color="#3b82f6" />
-            <Text style={styles.textoTema}>¿Qué hago si mi pedido demora?</Text>
+            <MaterialIcons name="report-problem" size={24} color="#3b82f6" />
+            <Text style={styles.textoTema}>Reclamos</Text>
           </Pressable>
         </Link>
       </View>

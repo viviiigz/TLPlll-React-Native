@@ -6,55 +6,91 @@ import DondeEstoy from '../../components/DondeEstoy';
 export default function AyudaArticuloScreen() {
   const { slug } = useLocalSearchParams<{ slug: string[] }>();
   const segmentos = Array.isArray(slug) ? slug : slug ? [slug] : [];
-  // la ruta permite distinguir la categoría de pagos del artículo de efectivo
   const esCategoriaPagos = segmentos.length === 1 && segmentos[0] === 'pagos';
+  const esCategoriaReclamos = segmentos.length === 1 && segmentos[0] === 'reclamos';
+  const esCategoriaAyuda = esCategoriaPagos || esCategoriaReclamos;
   const esPagoEfectivo = segmentos.length === 2 && segmentos[0] === 'pagos' && segmentos[1] === 'efectivo';
+  const esPedidoDemorado = segmentos.length === 2 && segmentos[0] === 'reclamos' && segmentos[1] === 'pedido-demorado';
   const titulo = esCategoriaPagos
     ? 'Métodos de pago'
-    : esPagoEfectivo
-      ? 'Pagar con efectivo en caja'
-      : 'Artículo de Ayuda';
+    : esCategoriaReclamos
+      ? 'Reclamos'
+      : esPagoEfectivo
+        ? 'Pagar con efectivo en caja'
+        : esPedidoDemorado
+          ? 'Pedido demorado'
+          : 'Artículo de Ayuda';
   const rutaMapeada = segmentos.join(' > ') || 'Tema general';
+  const rutaVolver = esPagoEfectivo
+    ? '/ayuda/pagos'
+    : esPedidoDemorado
+      ? '/ayuda/reclamos'
+      : '/ayuda';
+  const textoVolver = esPagoEfectivo
+    ? 'Volver a pagos'
+    : esPedidoDemorado
+      ? 'Volver a reclamos'
+      : 'Volver a temas';
 
   return (
     <>
       <Stack.Screen options={{ title: titulo }} />
       <View style={styles.container}>
         <View style={styles.encabezado}>
-          <MaterialIcons name={esCategoriaPagos ? 'credit-card' : 'menu-book'} size={32} color="#1f2937" />
+          <MaterialIcons
+            name={esCategoriaPagos ? 'credit-card' : esCategoriaReclamos ? 'report-problem' : 'menu-book'}
+            size={32}
+            color="#1f2937"
+          />
           <Text style={styles.titulo}>{titulo}</Text>
         </View>
 
-        {/* la categoría muestra sus opciones y el artículo muestra su explicación */}
-        {esCategoriaPagos ? (
+        {/* cada categoría muestra su opción y cada ruta final muestra su explicación */}
+        {esCategoriaAyuda ? (
           <>
             <Text style={styles.subtitulo}>Seleccioná una opción:</Text>
             <View style={styles.listaOpciones}>
-              <Link href="/ayuda/pagos/efectivo" asChild>
-                <Pressable style={styles.botonOpcion}>
-                  <MaterialIcons name="payments" size={24} color="#3b82f6" />
-                  <Text style={styles.textoOpcion}>Pagar con efectivo en caja</Text>
-                  <MaterialIcons name="chevron-right" size={24} color="#6b7280" />
-                </Pressable>
-              </Link>
+              {esCategoriaPagos ? (
+                <Link href="/ayuda/pagos/efectivo" asChild>
+                  <Pressable style={styles.botonOpcion}>
+                    <MaterialIcons name="payments" size={24} color="#3b82f6" />
+                    <Text style={styles.textoOpcion}>Pagar con efectivo en caja</Text>
+                    <MaterialIcons name="chevron-right" size={24} color="#6b7280" />
+                  </Pressable>
+                </Link>
+              ) : (
+                <Link href="/ayuda/reclamos/pedido-demorado" asChild>
+                  <Pressable style={styles.botonOpcion}>
+                    <MaterialIcons name="timer" size={24} color="#3b82f6" />
+                    <Text style={styles.textoOpcion}>¿Qué hago si mi pedido demora?</Text>
+                    <MaterialIcons name="chevron-right" size={24} color="#6b7280" />
+                  </Pressable>
+                </Link>
+              )}
             </View>
           </>
         ) : (
           <View style={styles.tarjeta}>
-            <Text style={styles.etiquetaRuta}>{esPagoEfectivo ? 'Métodos de pago' : 'Estás leyendo sobre:'}</Text>
-            <Text style={styles.rutaString}>{esPagoEfectivo ? 'Efectivo en caja' : rutaMapeada}</Text>
+            <Text style={styles.etiquetaRuta}>
+              {esPagoEfectivo ? 'Métodos de pago' : esPedidoDemorado ? 'Reclamos' : 'Estás leyendo sobre:'}
+            </Text>
+            <Text style={styles.rutaString}>
+              {esPagoEfectivo ? 'Efectivo en caja' : esPedidoDemorado ? 'Pedido demorado' : rutaMapeada}
+            </Text>
             <Text style={styles.contenido}>
               {esPagoEfectivo
                 ? 'Al confirmar tu pedido, la app muestra el total a pagar. Para pagar en efectivo, aboná ese total en caja. La aplicación todavía no registra el medio de pago.'
-                : 'Acá iría el contenido detallado para este tema de ayuda.'}
+                : esPedidoDemorado
+                  ? 'Si tu pedido está demorando, acercate a la barra y consultá con tu número de turno. Ese número aparece en la pantalla de confirmación del pedido.'
+                  : 'Acá iría el contenido detallado para este tema de ayuda.'}
             </Text>
           </View>
         )}
 
-        {/* el artículo de efectivo vuelve a la categoría de pagos */}
-        <Pressable style={styles.botonVolver} onPress={() => router.back()}>
+        {/* el botón vuelve siempre a la pantalla anterior de la jerarquía */}
+        <Pressable style={styles.botonVolver} onPress={() => router.replace(rutaVolver)}>
           <MaterialIcons name="arrow-back" size={20} color="#fff" />
-          <Text style={styles.textoBoton}>{esPagoEfectivo ? 'Volver a pagos' : 'Volver a Temas'}</Text>
+          <Text style={styles.textoBoton}>{textoVolver}</Text>
         </Pressable>
 
         <DondeEstoy />

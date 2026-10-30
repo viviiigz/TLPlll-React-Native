@@ -79,6 +79,40 @@ let avisosMemoria: Aviso[] = [
 
 let notificacionesHabilitadas = false;
 
+// borrador temporal para armar el reporte entre pantallas sin perder datos
+let borradorMemoria: Partial<Reporte> = {
+  categoria: 'electricidad',
+};
+const suscriptoresBorrador = new Set<() => void>();
+
+function avisarCambiosBorrador() {
+  suscriptoresBorrador.forEach((fn) => fn());
+}
+
+export function useBorradorReporte() {
+  const [borrador, setBorrador] = useState<Partial<Reporte>>(borradorMemoria);
+
+  useEffect(() => {
+    const actualizar = () => setBorrador({ ...borradorMemoria });
+    suscriptoresBorrador.add(actualizar);
+    return () => {
+      suscriptoresBorrador.delete(actualizar);
+    };
+  }, []);
+
+  return borrador;
+}
+
+export function actualizarBorrador(datos: Partial<Reporte>) {
+  borradorMemoria = { ...borradorMemoria, ...datos };
+  avisarCambiosBorrador();
+}
+
+export function limpiarBorrador() {
+  borradorMemoria = { categoria: 'electricidad' };
+  avisarCambiosBorrador();
+}
+
 // lista de funciones suscriptoras para actualizar las pantallas en tiempo real
 const suscriptoresReportes = new Set<() => void>();
 const suscriptoresAvisos = new Set<() => void>();

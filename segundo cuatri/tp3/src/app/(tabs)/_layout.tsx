@@ -1,45 +1,46 @@
-import { SymbolView } from 'expo-symbols';
+import React from 'react';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Tabs } from 'expo-router';
-import { Platform, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 
+// funcion auxiliar para mostrar el icono correspondiente a cada tab
+function TabBarIcon(props: {
+  name: React.ComponentProps<typeof FontAwesome>['name'];
+  color: string;
+}) {
+  return <FontAwesome size={24} style={{ marginBottom: -3 }} {...props} />;
+}
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
+    // configuro las tres pestañas solicitadas en la consigna
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: useClientOnlyValue(false, true),
       }}>
+      {/* 1. tab reportes: inicio con la lista de reportes propios */}
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => (
-            <SymbolView
-              name={{
-                ios: 'chevron.left.forwardslash.chevron.right',
-                android: 'code',
-                web: 'code',
-              }}
-              tintColor={color}
-              size={28}
-            />
-          ),
+          title: 'Reportes',
+          tabBarLabel: 'Reportes',
+          tabBarIcon: ({ color }) => <TabBarIcon name="list-alt" color={color as string} />,
           headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable style={{ marginRight: 15 }}>
+            // agrego un boton en la cabecera para ir rapido a los ajustes de la app
+            <Link href={'/ajustes-app' as any} asChild>
+              <Pressable style={{ marginRight: 16 }}>
                 {({ pressed }) => (
-                  <SymbolView
-                    name={{ ios: 'info.circle', android: 'info', web: 'info' }}
-                    size={25}
-                    tintColor={Colors[colorScheme].text}
+                  <FontAwesome
+                    name="cog"
+                    size={22}
+                    color={Colors[colorScheme ?? 'light'].text}
                     style={{ opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
@@ -48,21 +49,32 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      {/* 2. tab avisos: bandeja de notificaciones internas */}
+      <Tabs.Screen
+        name="avisos"
+        options={{
+          title: 'Bandeja de Avisos',
+          tabBarLabel: 'Avisos',
+          tabBarIcon: ({ color }) => <TabBarIcon name="bell-o" color={color as string} />,
+        }}
+      />
+
+      {/* 3. tab permisos: panel de control de permisos del dispositivo */}
+      <Tabs.Screen
+        name="permisos"
+        options={{
+          title: 'Estado de Permisos',
+          tabBarLabel: 'Permisos',
+          tabBarIcon: ({ color }) => <TabBarIcon name="shield" color={color as string} />,
+        }}
+      />
+
+      {/* oculto two.tsx si existia de la plantilla anterior para que no aparezca en las tabs */}
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => (
-            <SymbolView
-              name={{
-                ios: 'chevron.left.forwardslash.chevron.right',
-                android: 'code',
-                web: 'code',
-              }}
-              tintColor={color}
-              size={28}
-            />
-          ),
+          href: null,
         }}
       />
     </Tabs>

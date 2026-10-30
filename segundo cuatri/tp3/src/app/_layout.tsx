@@ -7,24 +7,23 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 
 export {
-  // Catch any errors thrown by the Layout component.
+  // capturo errores que puedan suceder en el arbol de navegacion
   ErrorBoundary,
 } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// evito que el splash screen se oculte antes de cargar las fuentes necesarias
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  // cargo las fuentes desde la carpeta de assets
   const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -46,10 +45,49 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
+    // aplico el tema segun la preferencia del sistema
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
+        {/* la barra de pestañas principal con las tres pantallas requeridas */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+
+        {/* pantallas del flujo de creacion y detalle de reportes */}
+        <Stack.Screen
+          name="reporte/nuevo"
+          options={{ title: 'Nuevo Reporte', headerBackTitle: 'Volver' }}
+        />
+        <Stack.Screen
+          name="reporte/escanear"
+          options={{ title: 'Escanear QR de Aula', headerBackTitle: 'Volver' }}
+        />
+        <Stack.Screen
+          name="reporte/foto"
+          options={{ title: 'Adjuntar Foto', headerBackTitle: 'Volver' }}
+        />
+        <Stack.Screen
+          name="reporte/ubicacion"
+          options={{ title: 'Marcar Ubicación', headerBackTitle: 'Volver' }}
+        />
+        <Stack.Screen
+          name="reporte/[id]"
+          options={{ title: 'Detalle del Reporte', headerBackTitle: 'Reportes' }}
+        />
+
+        {/* pantalla de ajustes de notificaciones */}
+        <Stack.Screen
+          name="ajustes-app"
+          options={{ title: 'Ajustes de la App', headerBackTitle: 'Volver' }}
+        />
+
+        {/* pantalla previa a los permisos con comportamiento modal como pide la consigna */}
+        <Stack.Screen
+          name="permisos/[recurso]"
+          options={{
+            presentation: 'modal',
+            title: 'Permiso Requerido',
+            headerShown: false,
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

@@ -142,3 +142,4 @@ export function usePermiso(recurso: TipoRecurso): PermisoInfo {
     consultar: consultarNativo,
   };
 }
+

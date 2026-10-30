@@ -3,7 +3,8 @@ import * as WebBrowser from 'expo-web-browser';
 import type { ComponentProps } from 'react';
 import { Platform } from 'react-native';
 
-export function ExternalLink(props: Omit<ComponentProps<typeof Link>, 'href'> & { href: string }) {
+// este componente me sirve para abrir enlaces externos sin romper la navegacion de la app
+export function ExternalLink(props: Omit<ComponentProps<typeof Link>, 'href'> & { href: any }) {
   return (
     <Link
       target="_blank"
@@ -11,9 +12,8 @@ export function ExternalLink(props: Omit<ComponentProps<typeof Link>, 'href'> & 
       href={props.href}
       onPress={(e) => {
         if (Platform.OS !== 'web') {
-          // Prevent the default behavior of linking to the default browser on native.
+          // evito que abra el navegador externo en el celular y uso el navegador integrado
           e.preventDefault();
-          // Open the link in an in-app browser.
           WebBrowser.openBrowserAsync(props.href as string);
         }
       }}

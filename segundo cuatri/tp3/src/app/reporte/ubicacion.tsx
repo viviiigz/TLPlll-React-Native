@@ -7,12 +7,11 @@ import {
   ScrollView,
   SafeAreaView,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { actualizarBorrador } from '@/lib/reportesStore';
+import { actualizarBorrador, useBorradorReporte } from '@/lib/reportesStore';
 
 const SECTORES_EDIFICIO = [
   'Patio Central',
@@ -27,6 +26,7 @@ const SECTORES_EDIFICIO = [
 
 export default function PantallaMarcarUbicacion() {
   const router = useRouter();
+  const borrador = useBorradorReporte();
   const [cargando, setCargando] = useState(false);
   const [mensajeError, setMensajeError] = useState<string | null>(null);
 
@@ -61,11 +61,8 @@ export default function PantallaMarcarUbicacion() {
           },
         });
 
-        Alert.alert(
-          'Ubicación Aproximada',
-          'Se registró la zona general del predio escolar sin exponer coordenadas exactas.',
-          [{ text: 'Aceptar', onPress: () => router.back() }]
-        );
+        // vuelvo al formulario para que la ubicacion elegida se vea ahi
+        router.back();
       } else {
         // si es precisa, guardo coordenadas y sector
         actualizarBorrador({
@@ -77,11 +74,8 @@ export default function PantallaMarcarUbicacion() {
           },
         });
 
-        Alert.alert(
-          'Ubicación Precisa Registrada',
-          'Se guardaron las coordenadas GPS exactas del desperfecto.',
-          [{ text: 'Aceptar', onPress: () => router.back() }]
-        );
+        // vuelvo al formulario para que la ubicacion elegida se vea ahi
+        router.back();
       }
     } catch (err) {
       console.warn('error al obtener ubicacion:', err);
@@ -100,9 +94,8 @@ export default function PantallaMarcarUbicacion() {
       },
     });
 
-    Alert.alert('Sector Registrado', `Se guardó el sector "${sector}".`, [
-      { text: 'Aceptar', onPress: () => router.back() },
-    ]);
+    // vuelvo al formulario para que el sector elegido se vea ahi
+    router.back();
   };
 
   return (
@@ -115,18 +108,36 @@ export default function PantallaMarcarUbicacion() {
           </Text>
         </View>
 
-        {/* boton para solicitar la ubicacion actual */}
-        {cargando ? (
-          <View style={styles.cargandoCaja}>
-            <ActivityIndicator size="small" color="#0f766e" />
-            <Text style={styles.cargandoTexto}>Obteniendo ubicación del dispositivo...</Text>
+        {borrador.ubicacion?.sector ? (
+          <View style={styles.ubicacionActual}>
+            <FontAwesome name="map-marker" size={18} color="#0f766e" />
+            <View style={styles.ubicacionActualTexto}>
+              <Text style={styles.ubicacionActualTitulo}>Ubicación seleccionada</Text>
+              <Text style={styles.ubicacionActualSector}>{borrador.ubicacion.sector}</Text>
+            </View>
           </View>
-        ) : (
-          <Pressable style={styles.btnGPS} onPress={obtenerUbicacionGPS}>
+        ) : null}
+
+        {/* mantengo el boton visible para que la pantalla no cambie de tamaño mientras consulta el gps */}
+        <Pressable
+          style={[styles.btnGPS, cargando && styles.btnGPSCargando]}
+          onPress={obtenerUbicacionGPS}
+          disabled={cargando}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: cargando, busy: cargando }}>
+          {cargando ? (
+            <ActivityIndicator size="small" color="#ffffff" />
+          ) : (
             <FontAwesome name="location-arrow" size={18} color="#ffffff" />
-            <Text style={styles.btnGPSTexto}>Usar mi ubicación actual</Text>
-          </Pressable>
-        )}
+          )}
+          <Text style={styles.btnGPSTexto}>
+            {cargando
+              ? 'Actualizando ubicación...'
+              : borrador.ubicacion
+                ? 'Actualizar ubicación actual'
+                : 'Usar mi ubicación actual'}
+          </Text>
+        </Pressable>
 
         {/* mensaje si el permiso fue denegado o fallo */}
         {mensajeError ? (
@@ -188,21 +199,28 @@ const styles = StyleSheet.create({
     color: '#64748b',
     lineHeight: 18,
   },
-  cargandoCaja: {
+  ubicacionActual: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
     backgroundColor: '#ffffff',
-    padding: 16,
+    padding: 14,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#e2e8f0',
   },
-  cargandoTexto: {
+  ubicacionActualTexto: {
+    flex: 1,
+    marginLeft: 10,
+    gap: 2,
+  },
+  ubicacionActualTitulo: {
     fontSize: 13,
-    color: '#0f766e',
-    fontWeight: '600',
+    color: '#334155',
+    fontWeight: '700',
+  },
+  ubicacionActualSector: {
+    fontSize: 13,
+    color: '#64748b',
   },
   btnGPS: {
     flexDirection: 'row',
@@ -217,6 +235,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
+  },
+  btnGPSCargando: {
+    opacity: 0.8,
   },
   btnGPSTexto: {
     color: '#ffffff',
@@ -285,4 +306,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

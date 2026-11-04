@@ -7,7 +7,7 @@ import {
   ScrollView,
   Pressable,
   Image,
-  Alert,
+  Modal,
   SafeAreaView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -27,6 +27,25 @@ const CATEGORIAS: { id: CategoriaReporte; nombre: string; icono: React.Component
   { id: 'equipos', nombre: 'Equipos', icono: 'desktop' },
 ];
 
+type ErroresFormulario = {
+  titulo?: string;
+  aula?: string;
+};
+
+function validarFormulario(titulo: string, aula: string): ErroresFormulario {
+  const errores: ErroresFormulario = {};
+
+  if (!titulo.trim()) {
+    errores.titulo = 'Ingresá un título para el desperfecto.';
+  }
+
+  if (!aula.trim()) {
+    errores.aula = 'Ingresá el aula o lugar del desperfecto.';
+  }
+
+  return errores;
+}
+
 export default function PantallaNuevoReporte() {
   const router = useRouter();
   // obtengo el borrador actual (por si volvemos de escanear qr, sacar foto o marcar ubicacion)
@@ -36,6 +55,8 @@ export default function PantallaNuevoReporte() {
   const [descripcion, setDescripcion] = useState(borrador.descripcion || '');
   const [aula, setAula] = useState(borrador.aula || '');
   const [categoria, setCategoria] = useState<CategoriaReporte>(borrador.categoria || 'electricidad');
+  const [errores, setErrores] = useState<ErroresFormulario>({});
+  const [reporteGuardado, setReporteGuardado] = useState(false);
 
   // si el borrador trajo aula desde el qr, lo sincronizo
   React.useEffect(() => {
@@ -45,12 +66,13 @@ export default function PantallaNuevoReporte() {
   }, [borrador.aula]);
 
   const guardar = () => {
-    if (!titulo.trim()) {
-      Alert.alert('Falta el título', 'Por favor ingresá un título breve para el reporte.');
+    if (reporteGuardado) {
       return;
     }
-    if (!aula.trim()) {
-      Alert.alert('Falta el aula o lugar', 'Podés escanear el QR o escribir el aula a mano.');
+
+    const erroresFormulario = validarFormulario(titulo, aula);
+    setErrores(erroresFormulario);
+    if (Object.keys(erroresFormulario).length > 0) {
       return;
     }
 
@@ -64,11 +86,9 @@ export default function PantallaNuevoReporte() {
       ubicacion: borrador.ubicacion,
     });
 
-    // limpio el borrador temporal y vuelvo al inicio
+    // limpio el borrador temporal y muestro la confirmacion del guardado
     limpiarBorrador();
-    Alert.alert('Reporte Creado', 'El desperfecto fue registrado correctamente.', [
-      { text: 'Aceptar', onPress: () => router.replace('/' as any) },
-    ]);
+    setReporteGuardado(true);
   };
 
   return (
@@ -84,9 +104,16 @@ export default function PantallaNuevoReporte() {
             value={titulo}
             onChangeText={(txt) => {
               setTitulo(txt);
+              setErrores((actuales) => ({ ...actuales, titulo: undefined }));
               actualizarBorrador({ titulo: txt });
             }}
+            editable={!reporteGuardado}
           />
+          {errores.titulo ? (
+            <Text accessibilityRole="alert" style={styles.errorCampo}>
+              {errores.titulo}
+            </Text>
+          ) : null}
         </View>
 
         {/* aula con boton para escanear qr o escribir a mano */}
@@ -103,8 +130,10 @@ export default function PantallaNuevoReporte() {
               value={aula}
               onChangeText={(txt) => {
                 setAula(txt);
+                setErrores((actuales) => ({ ...actuales, aula: undefined }));
                 actualizarBorrador({ aula: txt });
               }}
+              editable={!reporteGuardado}
             />
             {/* al tocar escanear recien aca se abrira la camara pidiendo permiso en contexto */}
             <Pressable
@@ -114,6 +143,11 @@ export default function PantallaNuevoReporte() {
               <Text style={styles.btnEscanearTexto}>Escanear</Text>
             </Pressable>
           </View>
+          {errores.aula ? (
+            <Text accessibilityRole="alert" style={styles.errorCampo}>
+              {errores.aula}
+            </Text>
+          ) : null}
         </View>
 
         {/* categoria */}
@@ -221,11 +255,42 @@ export default function PantallaNuevoReporte() {
         </View>
 
         {/* boton guardar reporte */}
-        <Pressable style={styles.btnGuardar} onPress={guardar}>
+        <Pressable
+          style={styles.btnGuardar}
+          onPress={guardar}
+          disabled={reporteGuardado}>
           <FontAwesome name="check" size={16} color="#ffffff" style={{ marginRight: 8 }} />
           <Text style={styles.btnGuardarTexto}>Guardar Reporte</Text>
         </Pressable>
+
       </ScrollView>
+
+      {/* muestro una confirmacion modal para que el resultado del guardado sea claro */}
+      <Modal
+        animationType="fade"
+        transparent
+        visible={reporteGuardado}
+        onRequestClose={() => router.replace('/' as any)}>
+        <View style={styles.modalFondo}>
+          <View
+            accessibilityRole="alert"
+            style={styles.modalContenido}
+            accessibilityLabel="Reporte guardado correctamente">
+            <View style={styles.iconoExito}>
+              <FontAwesome name="check" size={24} color="#15803d" />
+            </View>
+            <Text style={styles.mensajeExitoTitulo}>Reporte guardado</Text>
+            <Text style={styles.mensajeExitoTexto}>
+              El desperfecto se registró correctamente.
+            </Text>
+            <Pressable
+              style={styles.btnVerReportes}
+              onPress={() => router.replace('/' as any)}>
+              <Text style={styles.btnVerReportesTexto}>Ver mis reportes</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -255,6 +320,10 @@ const styles = StyleSheet.create({
   labelAyuda: {
     fontSize: 11,
     color: '#64748b',
+  },
+  errorCampo: {
+    color: '#b91c1c',
+    fontSize: 12,
   },
   input: {
     backgroundColor: '#ffffff',
@@ -386,5 +455,53 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
+  modalFondo: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+    backgroundColor: 'rgba(15, 23, 42, 0.55)',
+  },
+  modalContenido: {
+    width: '100%',
+    maxWidth: 380,
+    backgroundColor: '#f0fdf4',
+    borderColor: '#86efac',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 14,
+    gap: 8,
+    alignItems: 'center',
+  },
+  iconoExito: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#dcfce7',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  mensajeExitoTitulo: {
+    color: '#166534',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  mensajeExitoTexto: {
+    color: '#166534',
+    fontSize: 13,
+  },
+  btnVerReportes: {
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    backgroundColor: '#0f766e',
+    borderRadius: 8,
+    paddingVertical: 8,
+    marginTop: 4,
+  },
+  btnVerReportesTexto: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
 });
-

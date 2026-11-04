@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   Linking,
   SafeAreaView,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -23,16 +22,18 @@ export default function PantallaEscanearQR() {
   // estado para la alternativa manual si no hay camara o no se puede escanear
   const [codigoManual, setCodigoManual] = useState('');
   const [escaneado, setEscaneado] = useState(false);
+  const [aulaDetectada, setAulaDetectada] = useState<string | null>(null);
 
   // escucho si el usuario vuelve de ajustes para actualizar el permiso de inmediato
   useRevisarAlVolver(consultarPermiso);
 
   // funcion que procesa el aula encontrada (ya sea por qr o escrita a mano)
   const aplicarAula = (aulaDetectada: string) => {
-    actualizarBorrador({ aula: aulaDetectada.trim() });
-    Alert.alert('Aula asignada', `Se completó el campo con "${aulaDetectada}".`, [
-      { text: 'Aceptar', onPress: () => router.back() },
-    ]);
+    const aula = aulaDetectada.trim();
+    if (!aula) return;
+
+    actualizarBorrador({ aula });
+    setAulaDetectada(aula);
   };
 
   // 1. estado cargando: el hook todavia esta consultando al sistema operativo
@@ -42,6 +43,33 @@ export default function PantallaEscanearQR() {
         <ActivityIndicator size="large" color="#0f766e" />
         <Text style={styles.textoCargando}>Consultando acceso a la cámara...</Text>
       </View>
+    );
+  }
+
+  if (aulaDetectada) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.confirmacion}>
+          <View style={styles.confirmacionIcono}>
+            <FontAwesome name="check" size={34} color="#15803d" />
+          </View>
+          <Text style={styles.confirmacionTitulo}>¡QR leído correctamente!</Text>
+          <Text style={styles.confirmacionDescripcion}>Aula detectada</Text>
+          <Text style={styles.aulaDetectada}>{aulaDetectada}</Text>
+
+          <Pressable style={styles.btnConfirmar} onPress={() => router.back()}>
+            <Text style={styles.btnConfirmarTexto}>Usar esta aula</Text>
+          </Pressable>
+          <Pressable
+            style={styles.btnReescanear}
+            onPress={() => {
+              setAulaDetectada(null);
+              setEscaneado(false);
+            }}>
+            <Text style={styles.btnReescanearTexto}>Escanear otro QR</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -188,6 +216,66 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0f172a',
+  },
+  confirmacion: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    gap: 12,
+    backgroundColor: '#f8fafc',
+  },
+  confirmacionIcono: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#dcfce7',
+    marginBottom: 8,
+  },
+  confirmacionTitulo: {
+    color: '#166534',
+    fontSize: 22,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  confirmacionDescripcion: {
+    color: '#64748b',
+    fontSize: 14,
+    marginTop: 8,
+  },
+  aulaDetectada: {
+    color: '#0f172a',
+    fontSize: 20,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  btnConfirmar: {
+    width: '100%',
+    maxWidth: 320,
+    alignItems: 'center',
+    backgroundColor: '#0f766e',
+    borderRadius: 10,
+    paddingVertical: 14,
+    marginTop: 8,
+  },
+  btnConfirmarTexto: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  btnReescanear: {
+    width: '100%',
+    maxWidth: 320,
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  btnReescanearTexto: {
+    color: '#64748b',
+    fontSize: 14,
+    fontWeight: '600',
   },
   centrado: {
     flex: 1,

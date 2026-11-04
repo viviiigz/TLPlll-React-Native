@@ -5,12 +5,12 @@ import { AppState, type AppStateStatus } from 'react-native';
 // para poder re-consultar el estado de los permisos en caliente
 export function useRevisarAlVolver(revisar: () => void) {
   // guardo la referencia del estado anterior de la app
-  const anterior = useRef<AppStateStatus>(AppState.currentState);
+  const anterior = useRef<AppStateStatus>(AppState.currentState as AppStateStatus);
 
   useEffect(() => {
     // me suscribo a los cambios de estado de la aplicacion (segundo plano, activa, etc)
     const sub = AppState.addEventListener('change', (nuevo: AppStateStatus) => {
-      const estabaAfuera = anterior.current.match(/inactive|background/);
+      const estabaAfuera = anterior.current === 'inactive' || anterior.current === 'background';
       // si la app vuelve a estar activa y antes no lo estaba, disparo la revision
       if (estabaAfuera && nuevo === 'active') {
         revisar();

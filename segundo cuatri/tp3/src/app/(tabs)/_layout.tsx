@@ -70,13 +70,6 @@ export default function TabLayout() {
         }}
       />
 
-      {/* oculto two.tsx si existia de la plantilla anterior para que no aparezca en las tabs */}
-      <Tabs.Screen
-        name="two"
-        options={{
-          href: null,
-        }}
-      />
     </Tabs>
   );
 }

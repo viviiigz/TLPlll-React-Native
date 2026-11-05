@@ -10,6 +10,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { usePermiso, type TipoRecurso } from '@/hooks/usePermiso';
+import { useAjustesNotificaciones } from '@/lib/reportesStore';
 
 // informacion y textos de proposito para cada recurso segun la teoria de clase
 const DATOS_RECURSOS: Record<
@@ -57,6 +58,7 @@ export default function PantallaPreviaPermiso() {
 
   // uso mi hook unificado para conocer el estado y accionar
   const { estado, pedir, abrirAjustes } = usePermiso(info.tipo);
+  const { cambiar: cambiarNotificaciones } = useAjustesNotificaciones();
 
   // manejo la accion del unico boton permitido segun la pauta 5.1.1 iv de apple
   const manejarAccion = async () => {
@@ -66,7 +68,11 @@ export default function PantallaPreviaPermiso() {
       router.back();
     } else {
       // si todavia se puede preguntar, disparo el dialogo nativo oficial
-      await pedir();
+      const concedido = await pedir();
+      if (clave === 'notificaciones' && concedido) {
+        // activo la preferencia solo despues de que el sistema concede el permiso
+        cambiarNotificaciones(true);
+      }
       router.back();
     }
   };
@@ -217,4 +223,3 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
-

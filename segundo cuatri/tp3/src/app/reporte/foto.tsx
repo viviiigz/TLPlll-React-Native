@@ -111,7 +111,9 @@ export default function PantallaAdjuntarFoto() {
                 <FontAwesome name="camera" size={22} color="#0f766e" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.opcionTitulo}>Sacar foto ahora</Text>
+                <Text style={styles.opcionTitulo}>
+                  {borrador.fotoUri ? 'Sacar otra foto' : 'Sacar foto ahora'}
+                </Text>
                 <Text style={styles.opcionDesc}>
                   Abre la cámara para fotografiar el desperfecto en el aula.
                 </Text>
@@ -125,7 +127,9 @@ export default function PantallaAdjuntarFoto() {
                 <FontAwesome name="photo" size={20} color="#0284c7" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.opcionTitulo}>Elegir de la galería</Text>
+                <Text style={styles.opcionTitulo}>
+                  {borrador.fotoUri ? 'Elegir otra foto' : 'Elegir de la galería'}
+                </Text>
                 <Text style={styles.opcionDesc}>
                   Usa el selector nativo del sistema sin requerir permisos sobre tus fotos privadas.
                 </Text>
@@ -139,7 +143,8 @@ export default function PantallaAdjuntarFoto() {
         <View style={styles.avisoPrivacidad}>
           <FontAwesome name="shield" size={16} color="#15803d" />
           <Text style={styles.avisoPrivacidadTexto}>
-            <strong>Privacidad garantizada:</strong> El selector corre fuera de la app y solo entrega la foto que vos elijas. La app nunca lee tu galería completa.
+            <Text style={styles.textoEnfasis}>Privacidad garantizada: </Text>
+            El selector corre fuera de la app y solo entrega la foto que vos elijas. La app nunca lee tu galería completa.
           </Text>
         </View>
 
@@ -193,6 +198,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#64748b',
     fontWeight: '600',
+  },
+  btnAceptarFoto: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#0f766e',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignSelf: 'stretch',
+  },
+  btnAceptarFotoTexto: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '700',
   },
   opciones: {
     gap: 12,

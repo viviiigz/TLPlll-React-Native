@@ -7,6 +7,7 @@ import {
   Pressable,
   SafeAreaView,
   Alert,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -35,9 +36,15 @@ export default function PantallaAjustesApp() {
     }
 
     if (estado === 'bloqueado') {
+      if (Platform.OS === 'web') {
+        // en la web explico como cambiar el permiso porque no hay ajustes nativos para abrir
+        await abrirAjustes();
+        return;
+      }
+
       // si el permiso ya esta bloqueado, le explico al usuario y le ofrezco abrir ajustes
       Alert.alert(
-        'Permiso de Notificaciones Bloqueado',
+        'Permiso de notificaciones bloqueado',
         'Las notificaciones fueron denegadas en el sistema. Para recibirlas tenés que activarlas en los Ajustes del dispositivo.',
         [
           { text: 'Cancelar', style: 'cancel' },
@@ -47,6 +54,13 @@ export default function PantallaAjustesApp() {
           },
         ]
       );
+      return;
+    }
+
+    if (Platform.OS === 'web') {
+      // el navegador solo muestra el permiso como respuesta a una accion directa de la persona
+      const concedido = await pedir();
+      cambiar(concedido);
       return;
     }
 
@@ -78,12 +92,25 @@ export default function PantallaAjustesApp() {
               thumbColor="#ffffff"
             />
           </View>
+          <Text style={styles.ayudaPermiso}>
+            {estado === 'concedido'
+              ? Platform.OS === 'web'
+                ? 'El navegador ya permite las notificaciones para este sitio; por eso no vuelve a pedir permiso. El interruptor define si esta app te avisa.'
+                : 'El sistema permite las notificaciones; el interruptor define si esta app te avisa.'
+              : estado === 'bloqueado'
+                ? Platform.OS === 'web'
+                  ? 'El navegador bloqueó las notificaciones. Permitilas en los ajustes de este sitio y recargá la página.'
+                  : 'El sistema no permite las notificaciones. Habilitalas en Ajustes para poder activar el interruptor.'
+                : Platform.OS === 'web'
+                  ? 'Al activar el interruptor, el navegador te va a preguntar si permitís las notificaciones.'
+                  : 'Al activar el interruptor, vas a poder responder la solicitud de permiso del sistema.'}
+          </Text>
         </View>
 
         {/* estado actual del permiso en el sistema */}
         <View style={styles.cardEstado}>
           <View style={styles.estadoFila}>
-            <Text style={styles.estadoLabel}>Estado en el sistema:</Text>
+            <Text style={styles.estadoLabel}>Permiso del sistema:</Text>
             <Text
               style={[
                 styles.estadoValor,
@@ -103,7 +130,9 @@ export default function PantallaAjustesApp() {
           {estado === 'bloqueado' && (
             <Pressable style={styles.btnAjustesManual} onPress={() => abrirAjustes()}>
               <FontAwesome name="cog" size={14} color="#ffffff" />
-              <Text style={styles.btnAjustesManualTexto}>Habilitar en Ajustes</Text>
+              <Text style={styles.btnAjustesManualTexto}>
+                {Platform.OS === 'web' ? 'Cómo habilitarlas' : 'Habilitar en Ajustes'}
+              </Text>
             </Pressable>
           )}
         </View>
@@ -112,7 +141,9 @@ export default function PantallaAjustesApp() {
         <View style={styles.cardAlternativa}>
           <FontAwesome name="info-circle" size={16} color="#0369a1" />
           <Text style={styles.cardAlternativaTexto}>
-            <strong>Alternativa garantizada:</strong> Si decidís no habilitar las notificaciones, los avisos quedarán guardados igual en la pestaña <strong>Avisos</strong> para que nunca te pierdas una novedad.
+            <Text style={styles.textoEnfasis}>Alternativa garantizada: </Text>
+            Si decidís no habilitar las notificaciones, los avisos quedarán guardados igual en la pestaña{' '}
+            <Text style={styles.textoEnfasis}>Avisos</Text> para que nunca te pierdas una novedad.
           </Text>
         </View>
       </View>
@@ -173,6 +204,12 @@ const styles = StyleSheet.create({
     marginTop: 2,
     lineHeight: 16,
   },
+  ayudaPermiso: {
+    fontSize: 12,
+    color: '#475569',
+    lineHeight: 17,
+    marginHorizontal: 2,
+  },
   cardEstado: {
     backgroundColor: '#ffffff',
     padding: 14,
@@ -224,5 +261,7 @@ const styles = StyleSheet.create({
     color: '#0369a1',
     lineHeight: 17,
   },
+  textoEnfasis: {
+    fontWeight: '700',
+  },
 });
-

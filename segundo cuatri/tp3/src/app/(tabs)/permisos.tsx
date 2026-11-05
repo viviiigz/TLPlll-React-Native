@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -25,6 +25,17 @@ function TarjetaPermiso({
 }) {
   // utilizo mi hook unificado que escucha appstate al volver de ajustes
   const { estado, parcial, detalles, pedir, abrirAjustes, consultar } = usePermiso(recurso);
+  const [consultando, setConsultando] = useState(false);
+
+  // vuelvo a leer el estado del sistema sin volver a pedir el permiso
+  const reconsultarPermiso = async () => {
+    setConsultando(true);
+    try {
+      await consultar();
+    } finally {
+      setConsultando(false);
+    }
+  };
 
   // colores segun los estados definidos en la clase
   const colorPorEstado: Record<EstadoPermiso, { bg: string; texto: string; label: string }> = {
@@ -91,12 +102,15 @@ function TarjetaPermiso({
           </Pressable>
         )}
 
-        {estado === 'concedido' && (
-          <Pressable style={styles.btnConsultar} onPress={() => consultar()}>
-            <FontAwesome name="refresh" size={12} color="#0f766e" />
-            <Text style={styles.btnConsultarTexto}>Re-consultar</Text>
-          </Pressable>
-        )}
+        <Pressable
+          style={[styles.btnConsultar, consultando && styles.btnConsultarDeshabilitado]}
+          onPress={reconsultarPermiso}
+          disabled={consultando || estado === 'cargando'}>
+          <FontAwesome name="refresh" size={12} color="#0f766e" />
+          <Text style={styles.btnConsultarTexto}>
+            {consultando ? 'Consultando...' : 'Re-consultar'}
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -125,7 +139,8 @@ export default function PantallaPermisos() {
 
         <View style={styles.avisoRegla}>
           <Text style={styles.avisoReglaTexto}>
-            ● Este panel se actualiza automáticamente al volver de Ajustes gracias al hook unificado con AppState.
+            ● Re-consultar solo actualiza el estado: cerrar la app no revoca los permisos. Si denegaste uno, cambialo en{' '}
+            {Platform.OS === 'web' ? 'los permisos del sitio en el navegador.' : 'Ajustes del dispositivo.'}
           </Text>
         </View>
 
@@ -324,5 +339,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
   },
+  btnConsultarDeshabilitado: {
+    opacity: 0.6,
+  },
 });
-

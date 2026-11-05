@@ -51,7 +51,7 @@ let reportesMemoria: Reporte[] = [
     descripcion: 'La canilla del segundo lavamanos pierde un goteo continuo.',
     aula: 'Baño de Planta Baja',
     categoria: 'agua',
-    estado: 'en curso',
+    estado: 'pendiente',
     ubicacion: { sector: 'Patio Principal' },
     fecha: 'Ayer, 16:15',
   },
@@ -200,7 +200,7 @@ export function obtenerReportePorId(id: string): Reporte | undefined {
 
 // funcion que simula la resolucion de un reporte a los 10 segundos
 // si las notificaciones estan permitidas, programa la notificacion local
-// de lo contrario o de forma complementaria, siempre guarda el aviso en la bandeja interna /avisos
+// si no se puede programar una notificacion, guardo el aviso en la bandeja interna
 export async function simularResolucionReporte(id: string) {
   const rep = reportesMemoria.find((r) => r.id === id);
   if (!rep) return;
@@ -247,16 +247,16 @@ export async function simularResolucionReporte(id: string) {
     console.warn('no se pudo programar la notificacion nativa:', err);
   }
 
-  // siempre guardo el aviso en la bandeja interna como alternativa elegante cuando no hay notificaciones
-  const nuevoAviso: Aviso = {
-    id: `aviso-${Date.now()}`,
-    reporteId: id,
-    titulo: tituloAviso,
-    mensaje: notificacionProgramada
-      ? `${mensajeAviso} (notificación programada a los 10s)`
-      : `${mensajeAviso} (registrado en tu bandeja de avisos)`,
-    fecha: 'Recién',
-  };
-  avisosMemoria = [nuevoAviso, ...avisosMemoria];
-  avisarCambiosAvisos();
+  if (!notificacionProgramada) {
+    // uso la bandeja interna como alternativa cuando no hay notificaciones del sistema
+    const nuevoAviso: Aviso = {
+      id: `aviso-${Date.now()}`,
+      reporteId: id,
+      titulo: tituloAviso,
+      mensaje: `${mensajeAviso} (registrado en tu bandeja de avisos)`,
+      fecha: 'Recién',
+    };
+    avisosMemoria = [nuevoAviso, ...avisosMemoria];
+    avisarCambiosAvisos();
+  }
 }

@@ -30,9 +30,6 @@ export default function PantallaAdjuntarFoto() {
 
       if (!resultado.canceled && resultado.assets && resultado.assets.length > 0) {
         actualizarBorrador({ fotoUri: resultado.assets[0].uri });
-        Alert.alert('Foto capturada', 'La imagen fue adjuntada al reporte.', [
-          { text: 'Aceptar', onPress: () => router.back() },
-        ]);
       }
     } catch (err) {
       console.warn('error al abrir la camara:', err);
@@ -57,9 +54,6 @@ export default function PantallaAdjuntarFoto() {
 
       if (!resultado.canceled && resultado.assets && resultado.assets.length > 0) {
         actualizarBorrador({ fotoUri: resultado.assets[0].uri });
-        Alert.alert('Foto seleccionada', 'La imagen fue adjuntada al reporte.', [
-          { text: 'Aceptar', onPress: () => router.back() },
-        ]);
       }
     } catch (err) {
       console.warn('error al abrir el selector de imagenes:', err);
@@ -79,11 +73,15 @@ export default function PantallaAdjuntarFoto() {
           </Text>
         </View>
 
-        {/* si ya habia una foto en el borrador la muestro */}
+        {/* si ya habia una foto en el borrador la muestro y dejo confirmar su uso */}
         {borrador.fotoUri ? (
           <View style={styles.previewCaja}>
             <Image source={{ uri: borrador.fotoUri }} style={styles.preview} />
-            <Text style={styles.previewTexto}>Foto actual adjunta</Text>
+            <Text style={styles.previewTexto}>Foto lista para adjuntar</Text>
+            <Pressable style={styles.btnAceptarFoto} onPress={() => router.back()}>
+              <FontAwesome name="check" size={16} color="#ffffff" />
+              <Text style={styles.btnAceptarFotoTexto}>Aceptar esta foto</Text>
+            </Pressable>
           </View>
         ) : null}
 
@@ -98,7 +96,9 @@ export default function PantallaAdjuntarFoto() {
                 <FontAwesome name="camera" size={22} color="#0f766e" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.opcionTitulo}>Sacar foto ahora</Text>
+                <Text style={styles.opcionTitulo}>
+                  {borrador.fotoUri ? 'Sacar otra foto' : 'Sacar foto ahora'}
+                </Text>
                 <Text style={styles.opcionDesc}>
                   Abre la cámara para fotografiar el desperfecto en el aula.
                 </Text>
@@ -112,7 +112,9 @@ export default function PantallaAdjuntarFoto() {
                 <FontAwesome name="photo" size={20} color="#0284c7" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.opcionTitulo}>Elegir de la galería</Text>
+                <Text style={styles.opcionTitulo}>
+                  {borrador.fotoUri ? 'Elegir otra foto' : 'Elegir de la galería'}
+                </Text>
                 <Text style={styles.opcionDesc}>
                   Usa el selector nativo del sistema sin requerir permisos sobre tus fotos privadas.
                 </Text>
@@ -126,14 +128,17 @@ export default function PantallaAdjuntarFoto() {
         <View style={styles.avisoPrivacidad}>
           <FontAwesome name="shield" size={16} color="#15803d" />
           <Text style={styles.avisoPrivacidadTexto}>
-            <strong>Privacidad garantizada:</strong> El selector corre fuera de la app y solo entrega la foto que vos elijas. La app nunca lee tu galería completa.
+            <Text style={styles.textoEnfasis}>Privacidad garantizada: </Text>
+            El selector corre fuera de la app y solo entrega la foto que vos elijas. La app nunca lee tu galería completa.
           </Text>
         </View>
 
-        {/* boton para continuar sin foto si la persona no quiere */}
-        <Pressable style={styles.btnVolver} onPress={() => router.back()}>
-          <Text style={styles.btnVolverTexto}>Continuar sin adjuntar foto</Text>
-        </Pressable>
+        {/* dejo volver sin foto o salir de la pantalla de seleccion */}
+        {!borrador.fotoUri ? (
+          <Pressable style={styles.btnVolver} onPress={() => router.back()}>
+            <Text style={styles.btnVolverTexto}>Continuar sin adjuntar foto</Text>
+          </Pressable>
+        ) : null}
       </View>
     </SafeAreaView>
   );
@@ -179,6 +184,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#64748b',
     fontWeight: '600',
+  },
+  btnAceptarFoto: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#0f766e',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignSelf: 'stretch',
+  },
+  btnAceptarFotoTexto: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '700',
   },
   opciones: {
     gap: 12,
@@ -233,6 +254,9 @@ const styles = StyleSheet.create({
     color: '#166534',
     lineHeight: 16,
   },
+  textoEnfasis: {
+    fontWeight: '700',
+  },
   btnVolver: {
     paddingVertical: 12,
     alignItems: 'center',
@@ -245,4 +269,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

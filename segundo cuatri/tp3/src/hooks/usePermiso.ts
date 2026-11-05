@@ -105,8 +105,27 @@ export function usePermiso(recurso: TipoRecurso): PermisoInfo {
 
   // funcion para mandar al usuario a los ajustes de la app si el permiso quedo bloqueado
   const abrirAjustes = useCallback(async () => {
+    if (Platform.OS === 'web') {
+      // en la web cada permiso se modifica desde la configuracion del sitio en el navegador
+      const nombrePermiso =
+        recurso === 'camara' || recurso === 'camera'
+          ? 'la cámara'
+          : recurso === 'ubicacion' || recurso === 'location'
+            ? 'la ubicación'
+            : recurso === 'notificaciones' || recurso === 'notifications'
+              ? 'las notificaciones'
+              : 'las fotos';
+
+      if (typeof globalThis.alert === 'function') {
+        globalThis.alert(
+          `Abrí los permisos del sitio desde el icono junto a la dirección, permití ${nombrePermiso} para localhost y recargá la página.`
+        );
+      }
+      return;
+    }
+
     await Linking.openSettings();
-  }, []);
+  }, [recurso]);
 
   // calculo el estado de mi hook segun lo aprendido en la clase
   let estado: EstadoPermiso = 'cargando';
@@ -142,4 +161,3 @@ export function usePermiso(recurso: TipoRecurso): PermisoInfo {
     consultar: consultarNativo,
   };
 }
-

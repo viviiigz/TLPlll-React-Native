@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Alert,
+  ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
@@ -18,6 +19,19 @@ export default function PantallaAdjuntarFoto() {
   const router = useRouter();
   const borrador = useBorradorReporte();
   const [cargando, setCargando] = useState(false);
+  const [fotoSeleccionada, setFotoSeleccionada] = useState(borrador.fotoUri);
+
+  const confirmarFoto = () => {
+    if (!fotoSeleccionada) return;
+
+    actualizarBorrador({ fotoUri: fotoSeleccionada });
+    router.back();
+  };
+
+  const continuarSinFoto = () => {
+    actualizarBorrador({ fotoUri: undefined });
+    router.back();
+  };
 
   // funcion para sacar foto en el momento usando la camara
   const sacarFoto = async () => {
@@ -29,10 +43,7 @@ export default function PantallaAdjuntarFoto() {
       });
 
       if (!resultado.canceled && resultado.assets && resultado.assets.length > 0) {
-        actualizarBorrador({ fotoUri: resultado.assets[0].uri });
-        Alert.alert('Foto capturada', 'La imagen fue adjuntada al reporte.', [
-          { text: 'Aceptar', onPress: () => router.back() },
-        ]);
+        setFotoSeleccionada(resultado.assets[0].uri);
       }
     } catch (err) {
       console.warn('error al abrir la camara:', err);
@@ -56,10 +67,7 @@ export default function PantallaAdjuntarFoto() {
       });
 
       if (!resultado.canceled && resultado.assets && resultado.assets.length > 0) {
-        actualizarBorrador({ fotoUri: resultado.assets[0].uri });
-        Alert.alert('Foto seleccionada', 'La imagen fue adjuntada al reporte.', [
-          { text: 'Aceptar', onPress: () => router.back() },
-        ]);
+        setFotoSeleccionada(resultado.assets[0].uri);
       }
     } catch (err) {
       console.warn('error al abrir el selector de imagenes:', err);
@@ -71,7 +79,7 @@ export default function PantallaAdjuntarFoto() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+      <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <Text style={styles.titulo}>Foto del Desperfecto</Text>
           <Text style={styles.bajada}>
@@ -80,11 +88,16 @@ export default function PantallaAdjuntarFoto() {
         </View>
 
         {/* si ya habia una foto en el borrador la muestro */}
-        {borrador.fotoUri ? (
-          <View style={styles.previewCaja}>
-            <Image source={{ uri: borrador.fotoUri }} style={styles.preview} />
-            <Text style={styles.previewTexto}>Foto actual adjunta</Text>
-          </View>
+        {fotoSeleccionada ? (
+          <>
+            <View style={styles.previewCaja}>
+              <Image source={{ uri: fotoSeleccionada }} style={styles.preview} />
+              <Text style={styles.previewTexto}>Vista previa de la foto</Text>
+            </View>
+            <Pressable style={styles.btnConfirmar} onPress={confirmarFoto}>
+              <Text style={styles.btnConfirmarTexto}>Confirmar foto y volver al reporte</Text>
+            </Pressable>
+          </>
         ) : null}
 
         {/* botones de seleccion */}
@@ -131,10 +144,10 @@ export default function PantallaAdjuntarFoto() {
         </View>
 
         {/* boton para continuar sin foto si la persona no quiere */}
-        <Pressable style={styles.btnVolver} onPress={() => router.back()}>
+        <Pressable style={styles.btnVolver} onPress={continuarSinFoto}>
           <Text style={styles.btnVolverTexto}>Continuar sin adjuntar foto</Text>
         </Pressable>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -147,6 +160,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     gap: 16,
+    flexGrow: 1,
   },
   header: {
     gap: 4,
@@ -233,6 +247,19 @@ const styles = StyleSheet.create({
     color: '#166534',
     lineHeight: 16,
   },
+  btnConfirmar: {
+    alignItems: 'center',
+    backgroundColor: '#0f766e',
+    borderRadius: 10,
+    paddingVertical: 14,
+    marginTop: 4,
+  },
+  btnConfirmarTexto: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
   btnVolver: {
     paddingVertical: 12,
     alignItems: 'center',
@@ -245,4 +272,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

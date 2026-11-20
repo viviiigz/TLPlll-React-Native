@@ -18,6 +18,12 @@ export default function CatalogoStackLayout() {
           title: 'Biblioteca IPF',
         }}
       />
+      <Stack.Screen
+        name="libro/[isbn]"
+        options={{
+          title: 'Detalle del libro',
+        }}
+      />
     </Stack>
   );
 }

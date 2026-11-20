@@ -1,56 +1,185 @@
-# Welcome to your Expo app 👋
+# Biblioteca IPF — Trabajo Práctico N° 4
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App integradora desarrollada con **React Native**, **Expo** y **Expo Router** para la Tecnicatura Superior en Desarrollo de Software Multiplataforma (Instituto Politécnico Formosa).
 
-## Get started
+- **Versión del SDK de Expo:** `Expo SDK 58` (`expo ~58.0.26`, `expo-router ~58.0.32`, `react-native 0.88.1`, `typescript ~6.0.3`)
+- **Módulos nativos instalados:** únicamente `expo-camera` y `expo-notifications` (más `@expo/vector-icons`, `@react-native-async-storage/async-storage` para persistencia opcional y `jest-expo` para pruebas unitarias opcionales).
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Cómo ejecutar el proyecto
 
-2. Start the app
+```powershell
+# 1. Instalar dependencias
+npm install
 
-   ```bash
-   npx expo start
-   ```
+# 2. Iniciar el servidor de Expo para probar en Expo Go (Android o iOS)
+npx expo start
 
-In the output, you'll find options to open the app in a
+# 3. Verificaciones obligatorias
+npx tsc --noEmit
+npx expo lint
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+# 4. Tests unitarios de Pila y Cola (desafío opcional)
+npm test
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+### Credenciales del personal de biblioteca (pantalla `/login`)
+- **Usuario:** `bibliotecario`
+- **Clave:** `ipf2026`
 
-### Other setup steps
+---
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Árbol de carpetas de `src/app` y navegadores
 
-## Learn more
+```text
+src/app/
+├── _layout.tsx                  # Stack raíz (anchor: "(tabs)") + BibliotecaProvider + Stack.Protected (/login, /mostrador)
+├── (tabs)/
+│   ├── _layout.tsx              # Tabs (import { Tabs } from 'expo-router/js-tabs') con íconos Ionicons
+│   ├── (catalogo)/
+│   │   ├── _layout.tsx          # Stack propio de la tab "Catálogo" (header con botón "Personal" / "Mostrador")
+│   │   ├── index.tsx            # Ruta: / (Catálogo + "Vistos recientemente" + accesos Buscar y Escanear)
+│   │   └── libro/
+│   │       └── [isbn].tsx       # Ruta: /libro/[isbn] (Detalle validado dentro de la tab Catálogo)
+│   └── reservas.tsx             # Ruta: /reservas (Tab "Mis reservas": préstamos, recordatorios, espera y avisos)
+├── buscar.tsx                   # Ruta: /buscar?q= (Stack raíz, búsqueda en URL con debounce y limpieza)
+├── escanear.tsx                 # Ruta: /escanear (Stack raíz, escáner EAN-13 con 4 estados + ISBN manual)
+├── reservar/
+│   └── [isbn].tsx               # Ruta: /reservar/[isbn] (Stack raíz, presentation: "modal")
+├── permisos/
+│   └── [recurso].tsx            # Ruta: /permisos/[recurso] (Stack raíz, presentation: "modal")
+├── login.tsx                    # Ruta: /login (Modal, solo existe sin sesión vía Stack.Protected)
+├── mostrador.tsx                # Ruta: /mostrador (Stack raíz, solo existe con sesión vía Stack.Protected)
+├── reserva.tsx                  # Ruta: /reserva (<Redirect href="/reservas" />)
+└── +not-found.tsx               # Cualquier ruta inexistente (404 mostrando usePathname())
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+---
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Bloque `plugins` de `app.json` comentado
 
-## Join the community
+```jsonc
+"plugins": [
+  // Habilita el enrutamiento basado en archivos desde src/app y los deep links con scheme "bibliotecaipf"
+  "expo-router",
+  [
+    // Configura la pantalla de carga inicial (splash) nativa
+    "expo-splash-screen",
+    {
+      "backgroundColor": "#208AEF",
+      "image": "./assets/images/splash-icon.png",
+      "imageWidth": 76
+    }
+  ],
+  [
+    // Configura la cámara aplicando el principio de mínimo privilegio:
+    // declara solo el texto de propósito de cámara y desactiva explícitamente micrófono / audio
+    "expo-camera",
+    {
+      "cameraPermission": "Usamos tu cámara para leer el código de barras de los libros y abrir su ficha al instante.",
+      "microphonePermission": false,
+      "recordAudioAndroid": false
+    }
+  ],
+  [
+    // Configura las notificaciones locales y define el canal por defecto "prestamos" en Android
+    "expo-notifications",
+    {
+      "defaultChannel": "prestamos"
+    }
+  ]
+]
+```
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Tabla de permisos
+
+| Recurso | Módulo | Cuándo se pide | Alternativa si se deniega o bloquea |
+| :--- | :--- | :--- | :--- |
+| **Cámara** | `expo-camera` (`useCameraPermissions`) | Solo cuando la persona entra a `/escanear` y toca **“Habilitar cámara”** pasando primero por `/permisos/camara`. | Formulario **“Ingresar ISBN a mano”** siempre visible en `/escanear` + botón “Abrir Ajustes” si está bloqueado. |
+| **Notificaciones locales** | `expo-notifications` | Únicamente cuando la persona activa el interruptor **“Recordarme”** en un préstamo en `/reservas` (creando antes el canal `"prestamos"` en Android). | Los vencimientos siguen visibles en `/reservas` y las entregas desde el mostrador aparecen como **avisos internos** dentro de la app. |
+
+---
+
+## Justificación de `blockedPermissions` (Android)
+
+En `app.json` se declararon explícitamente en `android.blockedPermissions`:
+- `android.permission.RECORD_AUDIO`: la app solo escanea códigos de barras EAN-13, nunca graba video con audio.
+- `android.permission.ACCESS_FINE_LOCATION` y `android.permission.ACCESS_COARSE_LOCATION`: la app no utiliza ubicación ni instala `expo-location`.
+- `android.permission.READ_MEDIA_IMAGES` y `android.permission.READ_EXTERNAL_STORAGE`: la app no accede a la galería ni instala `expo-image-picker`.
+
+Esto aplica el principio de **mínimo privilegio** y evita que dependencias transitivas agreguen permisos innecesarios al `AndroidManifest.xml` final.
+
+---
+
+## Deep links de prueba
+
+En producción / Development Build se usa el esquema `bibliotecaipf://`.  
+En **Expo Go** se reemplaza por `exp://<IP_LOCAL>:8081/--/`:
+
+| Caso | URL con `scheme` propio | Equivalente en Expo Go |
+| :--- | :--- | :--- |
+| Detalle existente (*Ficciones*) | `bibliotecaipf://libro/9789875666481` | `exp://<IP>:8081/--/libro/9789875666481` |
+| Detalle con ISBN inválido | `bibliotecaipf://libro/123` | `exp://<IP>:8081/--/libro/123` |
+| Buscador precargado | `bibliotecaipf://buscar?q=borges` | `exp://<IP>:8081/--/buscar?q=borges` |
+| Ruta protegida sin sesión | `bibliotecaipf://mostrador` | `exp://<IP>:8081/--/mostrador` |
+| Redirección de URL vieja | `bibliotecaipf://reserva` | `exp://<IP>:8081/--/reserva` |
+| Escáner | `bibliotecaipf://escanear` | `exp://<IP>:8081/--/escanear` |
+| Pantalla 404 | `bibliotecaipf://ruta-inexistente` | `exp://<IP>:8081/--/ruta-inexistente` |
+
+---
+
+## Validaciones de entrega (`tsc`, `lint` y tests)
+
+### `npx tsc --noEmit`
+```text
+(sin errores — código de salida 0)
+```
+
+### `npx expo lint`
+```text
+(sin errores ni advertencias — código de salida 0)
+```
+
+### `npm test` (desafío opcional — 8 tests unitarios de `Pila` y `Cola`)
+```text
+PASS src/estructuras/__tests__/estructuras.test.ts
+  Pila
+    √ apila y desapila respetando el orden LIFO
+    √ devuelve undefined al hacer pop o tope en una pila vacía
+    √ aArray devuelve del más reciente al más antiguo sin exponer el estado interno
+    √ clonar crea una instancia independiente
+  Cola
+    √ encola y desencola respetando el orden FIFO sin usar shift
+    √ devuelve undefined al desencolar o consultar frente en una cola vacía
+    √ queda vacía después de desencolar todos los elementos
+    √ clonar crea una copia independiente de los elementos activos
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+```
+
+---
+
+## Desafíos opcionales implementados (A6)
+
+- **Persistencia:** préstamos, vistos recientemente, avisos e identificadores de notificaciones guardados en `@react-native-async-storage/async-storage`, esperando `hidratado` en `src/app/_layout.tsx` para no mostrar la app vacía al iniciar.
+- **Pruebas unitarias:** 8 casos con `jest-expo` en `src/estructuras/__tests__/estructuras.test.ts`.
+- **Debounce:** 300 ms con limpieza de temporizador en `src/app/buscar.tsx`.
+- **Modo oscuro:** `useColorScheme()` integrado con `COLORES_CLARO` y `COLORES_OSCURO` en `src/constants/tema.ts` mediante `src/hooks/useTema.ts`.
+
+---
+
+## Capturas de pantalla (checklist F2.4)
+
+> Agregar acá las capturas (o link al video corto) tomadas en el teléfono real con Expo Go:
+- [ ] Catálogo cargando, con error y con datos
+- [ ] Buscador (`/buscar?q=borges`)
+- [ ] Detalle inexistente (`/libro/123`)
+- [ ] Reserva con ejemplares y sin ejemplares (lista de espera)
+- [ ] Escáner en sus cuatro estados (`cargando`, `concedido`, `preguntable`, `bloqueado`)
+- [ ] Notificación local recibida (15 s demo)
+- [ ] Mostrador antes y después de “Entregar al siguiente”
+- [ ] Pantalla 404 (`+not-found.tsx`)

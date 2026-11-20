@@ -87,6 +87,21 @@ export default function CatalogoPantalla() {
   const { libros, cargando, error, reintentar } = useLibros();
   const { recientes, obtenerDisponibles } = useBiblioteca();
 
+  const ultimosTres = useMemo(() => {
+    const unicos: typeof recientes = [];
+    const vistos = new Set<string>();
+    for (const libro of recientes) {
+      if (!vistos.has(libro.isbn)) {
+        vistos.add(libro.isbn);
+        unicos.push(libro);
+        if (unicos.length === 3) {
+          break;
+        }
+      }
+    }
+    return unicos;
+  }, [recientes]);
+
   if (cargando) {
     return (
       <EstadoPantalla
@@ -106,8 +121,6 @@ export default function CatalogoPantalla() {
       />
     );
   }
-
-  const ultimosTres = recientes.slice(0, 3);
 
   return (
     <FlatList

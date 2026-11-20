@@ -1,12 +1,27 @@
 import { Stack } from 'expo-router';
+import { EstadoPantalla } from '../components/EstadoPantalla';
+import {
+  BibliotecaProvider,
+  useBiblioteca,
+} from '../context/BibliotecaContext';
 import { useTema } from '../hooks/useTema';
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
-export default function RootLayout() {
+function NavegadorRaiz() {
   const colores = useTema();
+  const { hidratado } = useBiblioteca();
+
+  if (!hidratado) {
+    return (
+      <EstadoPantalla
+        tipo="cargando"
+        mensaje="Preparando Biblioteca IPF..."
+      />
+    );
+  }
 
   return (
     <Stack
@@ -18,5 +33,13 @@ export default function RootLayout() {
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <BibliotecaProvider>
+      <NavegadorRaiz />
+    </BibliotecaProvider>
   );
 }

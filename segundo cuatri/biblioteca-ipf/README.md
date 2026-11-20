@@ -172,14 +172,33 @@ Tests:       8 passed, 8 total
 
 ---
 
-## Capturas de pantalla (checklist F2.4)
+## Capturas de pantalla (F2.4)
 
-> Agregar acá las capturas (o link al video corto) tomadas en el teléfono real con Expo Go:
-- [ ] Catálogo cargando, con error y con datos
-- [ ] Buscador (`/buscar?q=borges`)
-- [ ] Detalle inexistente (`/libro/123`)
-- [ ] Reserva con ejemplares y sin ejemplares (lista de espera)
-- [ ] Escáner en sus cuatro estados (`cargando`, `concedido`, `preguntable`, `bloqueado`)
-- [ ] Notificación local recibida (15 s demo)
-- [ ] Mostrador antes y después de “Entregar al siguiente”
-- [ ] Pantalla 404 (`+not-found.tsx`)
+### 1. Catálogo (cargando, error y datos) y Vistos recientemente
+![Catálogo cargando](./capturas/01-catalogo-cargando.png)
+![Catálogo con error](./capturas/02-catalogo-error.png)
+![Catálogo con datos](./capturas/03-catalogo-datos.png)
+![Vistos recientemente](./capturas/04-vistos-recientemente.png)
+
+### 2. Buscador y Detalle inexistente
+![Buscador](./capturas/05-buscador.png)
+![Detalle inexistente](./capturas/06-detalle-inexistente.png)
+
+### 3. Reserva con ejemplares y sin ejemplares (lista de espera)
+![Reserva con ejemplares](./capturas/07-reserva-con-ejemplares.png)
+![Reserva en lista de espera](./capturas/08-reserva-lista-espera.png)
+
+### 4. Escáner y permiso de cámara
+![Escáner estado preguntable e ingreso manual](./capturas/09-escanear-preguntable.png)
+![Pantalla previa y diálogo de permiso de cámara](./capturas/10-permiso-camara.png)
+
+### 5. Notificación local recibida en Expo Go (15 s demo)
+![Notificación recibida](./capturas/11-notificacion-recibida.jpg)
+
+### 6. Ingreso de personal y Mostrador (antes y después de “Entregar al siguiente”)
+![Login personal](./capturas/12-login-personal.png)
+![Mostrador antes de entregar](./capturas/13-mostrador-antes.png)
+![Mostrador después de entregar](./capturas/14-mostrador-despues.png)
+
+### 7. Pantalla 404
+![Pantalla 404](./capturas/15-pantalla-404.png)

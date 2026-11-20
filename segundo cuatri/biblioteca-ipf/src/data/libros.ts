@@ -120,3 +120,4 @@ export const LISTAS_ESPERA_INICIALES: Record<string, string[]> = {
   '9780132350884': ['Sofía Martínez'],
   '9788420471839': ['Mateo Ruiz', 'Valentina López'],
 };
+

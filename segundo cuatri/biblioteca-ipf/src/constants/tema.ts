@@ -84,3 +84,4 @@ export const CREDENCIALES_PERSONAL = {
 export const CANAL_NOTIFICACIONES = 'prestamos';
 export const DIAS_PRESTAMO = 7;
 export const SEGUNDOS_RECORDATORIO_DEMO = 15;
+

@@ -24,3 +24,4 @@ export function sumarDiasISO(dias: number): string {
   fecha.setDate(fecha.getDate() + dias);
   return fecha.toISOString();
 }
+

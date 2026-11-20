@@ -24,3 +24,4 @@ export async function buscarLibros(q: string): Promise<Libro[]> {
       l.autor.toLowerCase().includes(texto),
   ).map((libro) => ({ ...libro }));
 }
+

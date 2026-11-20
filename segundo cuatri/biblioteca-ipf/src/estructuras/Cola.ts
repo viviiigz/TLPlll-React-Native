@@ -59,3 +59,4 @@ export class Cola<T> {
     return new Cola<T>(this.aArray());
   }
 }
+

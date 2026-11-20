@@ -36,3 +36,4 @@ export type ResultadoEntrega = {
   eraUsuarioActual: boolean;
   tituloLibro: string;
 };
+

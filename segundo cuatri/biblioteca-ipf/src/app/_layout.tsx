@@ -12,7 +12,7 @@ export const unstable_settings = {
 
 function NavegadorRaiz() {
   const colores = useTema();
-  const { hidratado } = useBiblioteca();
+  const { hidratado, sesionPersonal } = useBiblioteca();
 
   if (!hidratado) {
     return (
@@ -48,6 +48,26 @@ function NavegadorRaiz() {
           presentation: 'modal',
         }}
       />
+
+      <Stack.Protected guard={!sesionPersonal}>
+        <Stack.Screen
+          name="login"
+          options={{
+            title: 'Ingreso de personal',
+            presentation: 'modal',
+          }}
+        />
+      </Stack.Protected>
+
+      <Stack.Protected guard={sesionPersonal}>
+        <Stack.Screen
+          name="mostrador"
+          options={{
+            title: 'Mostrador de biblioteca',
+          }}
+        />
+      </Stack.Protected>
+
       <Stack.Screen name="+not-found" options={{ title: 'No encontrada' }} />
     </Stack>
   );

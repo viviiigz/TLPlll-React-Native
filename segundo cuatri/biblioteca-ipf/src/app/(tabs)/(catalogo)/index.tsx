@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { EstadoPantalla } from '../../../components/EstadoPantalla';
 import { FilaLibro } from '../../../components/FilaLibro';
 import { TarjetaReciente } from '../../../components/TarjetaReciente';
@@ -25,7 +26,27 @@ function crearEstilos(colores: PaletaColores) {
     },
     encabezado: {
       marginBottom: ESPACIADO.lg,
+      gap: ESPACIADO.lg,
+    },
+    filaAcciones: {
+      flexDirection: 'row',
       gap: ESPACIADO.md,
+    },
+    botonPrimario: {
+      flex: 1,
+      minHeight: TAMANIOS.areaTactilMinima,
+      borderRadius: TAMANIOS.radioMd,
+      backgroundColor: colores.primario,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: ESPACIADO.sm,
+      paddingHorizontal: ESPACIADO.md,
+    },
+    textoPrimario: {
+      fontSize: TAMANIOS.textoMd,
+      fontWeight: '600',
+      color: colores.primarioTexto,
     },
     bloqueRecientes: {
       gap: ESPACIADO.sm,
@@ -90,6 +111,22 @@ export default function CatalogoPantalla() {
       )}
       ListHeaderComponent={
         <View style={styles.encabezado}>
+          <View style={styles.filaAcciones}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Buscar libros por título o autor"
+              style={styles.botonPrimario}
+              onPress={() => router.push('/buscar')}
+            >
+              <Ionicons
+                name="search-outline"
+                size={20}
+                color={colores.primarioTexto}
+              />
+              <Text style={styles.textoPrimario}>Buscar</Text>
+            </Pressable>
+          </View>
+
           {ultimosTres.length > 0 ? (
             <View style={styles.bloqueRecientes}>
               <Text style={styles.tituloSeccion}>Vistos recientemente</Text>

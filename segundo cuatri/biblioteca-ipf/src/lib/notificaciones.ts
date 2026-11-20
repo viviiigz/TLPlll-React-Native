@@ -1,11 +1,19 @@
-import * as Notifications from 'expo-notifications';
+import {
+  AndroidImportance,
+  SchedulableTriggerInputTypes,
+  cancelScheduledNotificationAsync,
+  getPermissionsAsync,
+  scheduleNotificationAsync,
+  setNotificationChannelAsync,
+  setNotificationHandler,
+} from 'expo-notifications';
 import { Platform } from 'react-native';
 import {
   CANAL_NOTIFICACIONES,
   SEGUNDOS_RECORDATORIO_DEMO,
 } from '../constants/tema';
 
-Notifications.setNotificationHandler({
+setNotificationHandler({
   handleNotification: async () => ({
     shouldShowBanner: true,
     shouldShowList: true,
@@ -19,9 +27,9 @@ export async function asegurarCanalPrestamos(): Promise<void> {
     return;
   }
 
-  await Notifications.setNotificationChannelAsync(CANAL_NOTIFICACIONES, {
+  await setNotificationChannelAsync(CANAL_NOTIFICACIONES, {
     name: 'Recordatorios de préstamos',
-    importance: Notifications.AndroidImportance.HIGH,
+    importance: AndroidImportance.HIGH,
     vibrationPattern: [0, 250, 250, 250],
   });
 }
@@ -32,7 +40,7 @@ export async function programarRecordatorioDevolucion(
 ): Promise<string> {
   await asegurarCanalPrestamos();
 
-  return Notifications.scheduleNotificationAsync({
+  return scheduleNotificationAsync({
     content: {
       title: 'Recordatorio de devolución',
       body: `Recordá devolver "${tituloLibro}" antes de la fecha límite.`,
@@ -40,7 +48,7 @@ export async function programarRecordatorioDevolucion(
       ...(Platform.OS === 'android' ? { channelId: CANAL_NOTIFICACIONES } : {}),
     },
     trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      type: SchedulableTriggerInputTypes.TIME_INTERVAL,
       seconds: SEGUNDOS_RECORDATORIO_DEMO,
     },
   });
@@ -50,7 +58,7 @@ export async function cancelarRecordatorio(
   notificacionId: string,
 ): Promise<void> {
   try {
-    await Notifications.cancelScheduledNotificationAsync(notificacionId);
+    await cancelScheduledNotificationAsync(notificacionId);
   } catch {
     // Si ya se disparó o no existe en el sistema, continuamos sin error.
   }
@@ -60,7 +68,7 @@ export async function tienePermisoNotificaciones(): Promise<boolean> {
   if (Platform.OS === 'web') {
     return false;
   }
-  const estado = await Notifications.getPermissionsAsync();
+  const estado = await getPermissionsAsync();
   return estado.granted;
 }
 
@@ -70,7 +78,7 @@ export async function enviarNotificacionEntrega(
 ): Promise<void> {
   await asegurarCanalPrestamos();
 
-  await Notifications.scheduleNotificationAsync({
+  await scheduleNotificationAsync({
     content: {
       title: '¡Tu libro ya está disponible!',
       body: `Ya podés retirar "${tituloLibro}" por el mostrador de la biblioteca.`,

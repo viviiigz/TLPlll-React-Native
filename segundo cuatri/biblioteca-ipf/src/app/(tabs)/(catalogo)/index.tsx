@@ -48,6 +48,24 @@ function crearEstilos(colores: PaletaColores) {
       fontWeight: '600',
       color: colores.primarioTexto,
     },
+    botonSecundario: {
+      flex: 1,
+      minHeight: TAMANIOS.areaTactilMinima,
+      borderRadius: TAMANIOS.radioMd,
+      backgroundColor: colores.superficie,
+      borderWidth: 1,
+      borderColor: colores.borde,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: ESPACIADO.sm,
+      paddingHorizontal: ESPACIADO.md,
+    },
+    textoSecundario: {
+      fontSize: TAMANIOS.textoMd,
+      fontWeight: '600',
+      color: colores.texto,
+    },
     bloqueRecientes: {
       gap: ESPACIADO.sm,
     },
@@ -124,6 +142,20 @@ export default function CatalogoPantalla() {
                 color={colores.primarioTexto}
               />
               <Text style={styles.textoPrimario}>Buscar</Text>
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Escanear código de barras de un libro"
+              style={styles.botonSecundario}
+              onPress={() => router.push('/escanear')}
+            >
+              <Ionicons
+                name="barcode-outline"
+                size={20}
+                color={colores.primario}
+              />
+              <Text style={styles.textoSecundario}>Escanear</Text>
             </Pressable>
           </View>
 

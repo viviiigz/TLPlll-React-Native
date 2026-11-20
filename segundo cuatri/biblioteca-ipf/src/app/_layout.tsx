@@ -33,10 +33,18 @@ function NavegadorRaiz() {
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="buscar" options={{ title: 'Buscar libros' }} />
+      <Stack.Screen name="escanear" options={{ title: 'Escanear libro' }} />
       <Stack.Screen
         name="reservar/[isbn]"
         options={{
           title: 'Confirmar reserva',
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
+        name="permisos/[recurso]"
+        options={{
+          title: 'Permiso necesario',
           presentation: 'modal',
         }}
       />

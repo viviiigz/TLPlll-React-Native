@@ -1,0 +1,122 @@
+import type { Libro } from '../types';
+
+export const LIBROS: Libro[] = [
+  {
+    isbn: '9789875666481',
+    titulo: 'Ficciones',
+    autor: 'Jorge Luis Borges',
+    anio: 1944,
+    ejemplares: 2,
+  },
+  {
+    isbn: '9788497592208',
+    titulo: 'Cien años de soledad',
+    autor: 'Gabriel García Márquez',
+    anio: 1967,
+    ejemplares: 3,
+  },
+  {
+    isbn: '9789500426978',
+    titulo: 'El Aleph',
+    autor: 'Jorge Luis Borges',
+    anio: 1949,
+    ejemplares: 0,
+  },
+  {
+    isbn: '9788420471839',
+    titulo: 'Rayuela',
+    autor: 'Julio Cortázar',
+    anio: 1963,
+    ejemplares: 0,
+  },
+  {
+    isbn: '9788499890944',
+    titulo: '1984',
+    autor: 'George Orwell',
+    anio: 1949,
+    ejemplares: 1,
+  },
+  {
+    isbn: '9780132350884',
+    titulo: 'Clean Code',
+    autor: 'Robert C. Martin',
+    anio: 2008,
+    ejemplares: 0,
+  },
+  {
+    isbn: '9780135957059',
+    titulo: 'The Pragmatic Programmer',
+    autor: 'David Thomas y Andrew Hunt',
+    anio: 2019,
+    ejemplares: 2,
+  },
+  {
+    isbn: '9781491950357',
+    titulo: 'Designing Data-Intensive Applications',
+    autor: 'Martin Kleppmann',
+    anio: 2017,
+    ejemplares: 1,
+  },
+  {
+    isbn: '9788420674209',
+    titulo: 'El túnel',
+    autor: 'Ernesto Sabato',
+    anio: 1948,
+    ejemplares: 3,
+  },
+  {
+    isbn: '9789875806252',
+    titulo: 'Martín Fierro',
+    autor: 'José Hernández',
+    anio: 1872,
+    ejemplares: 4,
+  },
+  {
+    isbn: '9788466331852',
+    titulo: 'Crónica de una muerte anunciada',
+    autor: 'Gabriel García Márquez',
+    anio: 1981,
+    ejemplares: 2,
+  },
+  {
+    isbn: '9788498387087',
+    titulo: 'El Principito',
+    autor: 'Antoine de Saint-Exupéry',
+    anio: 1943,
+    ejemplares: 2,
+  },
+  {
+    isbn: '9780201633610',
+    titulo: 'Design Patterns',
+    autor: 'Erich Gamma y otros',
+    anio: 1994,
+    ejemplares: 1,
+  },
+  {
+    isbn: '9781449373320',
+    titulo: 'Learning React',
+    autor: 'Alex Banks y Eve Porcello',
+    anio: 2020,
+    ejemplares: 2,
+  },
+  {
+    isbn: '9788441543287',
+    titulo: 'Estructuras de Datos y Algoritmos',
+    autor: 'Alfred V. Aho',
+    anio: 1988,
+    ejemplares: 0,
+  },
+  {
+    isbn: '9789500720786',
+    titulo: 'Bestiario',
+    autor: 'Julio Cortázar',
+    anio: 1951,
+    ejemplares: 2,
+  },
+];
+
+export const LISTAS_ESPERA_INICIALES: Record<string, string[]> = {
+  '9789500426978': ['Ana Gómez', 'Lucas Pérez'],
+  '9780132350884': ['Sofía Martínez'],
+  '9788420471839': ['Mateo Ruiz', 'Valentina López'],
+};

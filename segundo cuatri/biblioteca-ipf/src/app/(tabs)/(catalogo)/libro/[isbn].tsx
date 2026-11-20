@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Link, Stack, useLocalSearchParams } from 'expo-router';
+import { Link, Stack, router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import {
   ESPACIADO,
@@ -250,7 +250,12 @@ export default function DetalleLibroPantalla() {
           accessibilityRole="button"
           accessibilityLabel={`Reservar ${libro.titulo}`}
           style={styles.botonPrimario}
-          disabled
+          onPress={() =>
+            router.push({
+              pathname: '/reservar/[isbn]',
+              params: { isbn: libro.isbn },
+            })
+          }
         >
           <Ionicons
             name="bookmark-outline"
@@ -258,9 +263,7 @@ export default function DetalleLibroPantalla() {
             color={colores.primarioTexto}
           />
           <Text style={styles.textoBotonPrimario}>
-            {disponibles > 0
-              ? 'Reservar (próximo paso)'
-              : 'Anotarme en lista de espera (próximo paso)'}
+            {disponibles > 0 ? 'Reservar' : 'Anotarme en lista de espera'}
           </Text>
         </Pressable>
       )}
